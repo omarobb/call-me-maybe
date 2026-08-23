@@ -1,0 +1,9 @@
+# Pseudo-code for one step of constrained generation
+logits = model.forward(input_ids)               # raw token logits
+allowed = grammar_fsm.allowed_tokens(state)     # which tokens keep the output valid
+mask = build_mask(vocabulary, allowed)          # -inf for disallowed
+masked_logits = logits + mask                   # disallowed → -inf
+next_token = sample(softmax(masked_logits))     # sample from valid tokens only
+state = grammar_fsm.advance(state, next_token)  # update state for next step
+
+
