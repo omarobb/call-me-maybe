@@ -25,7 +25,7 @@ def sdk():
     best_value = None
     best_index = 0
     for idd, val in logits:
-        s = sdk.decode([idd])
+        s = sdk.decode([idd]) 
         if r.startswith(s):
             if best_value is None or val > best_value:
                 best_value = val
