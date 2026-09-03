@@ -1,4 +1,0 @@
-
-
-def constrained_d():
-    

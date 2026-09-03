@@ -1,11 +1,21 @@
-from attachments_project_ai.llm_sdk.llm_sdk import Small_LLM_Model
-
+from llm_sdk.llm_sdk import Small_LLM_Model
+from pydantic import BaseModel
 names = ['fn_add_numbers', 'fn_greet', 'fn_reverse_string',
-             'fn_get_square_root', 'fn_substitute_string_with_regex']
-neg = False
+         'fn_get_square_root', 'fn_substitute_string_with_regex']
 
 
-def sdk():
+class ParameterInfo(BaseModel):
+    type: str
+
+
+class FunctionEntry(BaseModel):
+    name: str
+    description: str
+    parameters: dict[str, ParameterInfo]
+    returns: ParameterInfo
+
+
+def sdk() -> None:
 
     sdk = Small_LLM_Model()
 
@@ -19,8 +29,7 @@ def sdk():
     ids = sdk.encode(test)
     ids = ids.tolist()
     ids = ids[0]
-    logits = sdk.get_logits_from_input_ids(ids)
-    logits = enumerate(logits)
+    logits = enumerate(sdk.get_logits_from_input_ids(ids))
     r = "et"
     best_value = None
     best_index = 0
@@ -46,6 +55,15 @@ def is_valid_integer_continuation(s: str, typed: str) -> bool:
         if typed[0] == '-':
             return (typed+s)[1:].isdigit()
     return (typed+s).isdigit()
+
+
+def build_parameter_schema(fn_name: str,
+                           fn_defintion: list[FunctionEntry])\
+                           -> dict[str, ParameterInfo]:
+    for fn in fn_defintion:
+        if fn.name == fn_name:
+            return fn.parameters
+    raise ValueError("There is no function like that")
 
 
 if __name__ == "__main__":
