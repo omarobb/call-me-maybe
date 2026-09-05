@@ -1,8 +1,0 @@
-argparse>=1.4.0
-huggingface-hub>=1.29.0
-numpy>=2.5.2
-pydantic>=2.13.5
-torch>=2.13.0
-transformers
-mypy
-flake8

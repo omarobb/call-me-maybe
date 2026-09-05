@@ -1,5 +1,7 @@
 from llm_sdk.llm_sdk import Small_LLM_Model
 from pydantic import BaseModel
+from cli import loader
+
 names = ['fn_add_numbers', 'fn_greet', 'fn_reverse_string',
          'fn_get_square_root', 'fn_substitute_string_with_regex']
 
@@ -65,7 +67,11 @@ def build_parameter_schema(fn_name: str,
             return fn.parameters
     raise ValueError("There is no function like that")
 
-
+# def load_function_definitions(path):
+#     try:
+#         with open(path, 'r') as p:
+#             loader()
+            
 if __name__ == "__main__":
     print(is_valid("e", "fn_gre", names))
     print(is_valid("et", "fn_gre", names))
