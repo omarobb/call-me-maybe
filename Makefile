@@ -9,6 +9,7 @@ env:
 	cd call && \
 	python3 -m venv .venv && \
 	ln -s -f /goinfre/$(USER)/call/.venv $(path)
+	export UV_LINK_MODE=copy
 
 install:
 	curl -LsSf https://astral.sh/uv/install.sh | sh
