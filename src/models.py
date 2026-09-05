@@ -1,6 +1,6 @@
 from llm_sdk.llm_sdk import Small_LLM_Model
-from pydantic import BaseModel, ValidationError
-from cli import loader
+from pydantic import BaseModel, ValidationError, TypeAdapter
+# from cli import loader
 import sys
 import json
 # from typing import TextIO
@@ -67,17 +67,14 @@ def build_parameter_schema(fn_name: str,
     raise ValueError("There is no function like that")
 
 
-def load_function_definitions(path: str) -> list[str]:
+def load_function_definitions(path: str) -> list[FunctionEntry]:
 
-    names = []
     try:
         with open(path, 'r',  encoding='utf-8') as p:
             ls = json.load(p)
-            for i in range(len(ls)):
-                model_v = FunctionEntry.model_validate(ls[i])
-                if isinstance(model_v, FunctionEntry):
-                    names.append(ls[i]['name'])
-            return names
+            validation = TypeAdapter(list[FunctionEntry])
+            if validation.validate_python(ls):
+                return ls
     except (json.JSONDecodeError, FileNotFoundError, TypeError, ValidationError) as e:
         print(f"ERROR in JSON syntax: {e}")
         sys.exit(1)
