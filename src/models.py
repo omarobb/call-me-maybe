@@ -5,9 +5,6 @@ import sys
 import json
 # from typing import TextIO
 
-names = []
-
-
 class ParameterInfo(BaseModel):
     type: str
 
@@ -26,9 +23,9 @@ def sdk() -> None:
     test: str = "name\": \"fn_gre"
 
     f = []
-    for n in names:
-        if n.startswith('fn_gre'):
-            f.append(n)
+    # for n in :
+    #     if n.startswith('fn_gre'):
+    #         f.append(n)
     print(f)
     ids = sdk.encode(test)
     ids = ids.tolist()
@@ -71,6 +68,8 @@ def build_parameter_schema(fn_name: str,
 
 
 def load_function_definitions(path: str) -> list[str]:
+
+    names = []
     try:
         with open(path, 'r',  encoding='utf-8') as p:
             ls = json.load(p)
@@ -84,11 +83,11 @@ def load_function_definitions(path: str) -> list[str]:
         sys.exit(1)
 
 if __name__ == "__main__":
-    print(is_valid("e", "fn_gre", names))
-    print(is_valid("et", "fn_gre", names))
-    print(is_valid("x", "fn_gre", names))
-    print(is_valid("fn_greet", "", names))
-    print(is_valid("fn_greeting", "", names))
+    # print(is_valid("e", "fn_gre", names))
+    # print(is_valid("et", "fn_gre", names))
+    # print(is_valid("x", "fn_gre", names))
+    # print(is_valid("fn_greet", "", names))
+    # print(is_valid("fn_greeting", "", names))
     print("empty+digit (True):", is_valid_integer_continuation("5", ""))
     print("neg then digit (True):", is_valid_integer_continuation("5", "-"))
     print("dash first (True):", is_valid_integer_continuation("-", ""))
