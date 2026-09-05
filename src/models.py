@@ -73,8 +73,7 @@ def load_function_definitions(path: str) -> list[FunctionEntry]:
         with open(path, 'r',  encoding='utf-8') as p:
             ls = json.load(p)
             validation = TypeAdapter(list[FunctionEntry])
-            if validation.validate_python(ls):
-                return ls
+            return validation.validate_python(ls)
     except (json.JSONDecodeError, FileNotFoundError, TypeError, ValidationError) as e:
         print(f"ERROR in JSON syntax: {e}")
         sys.exit(1)
