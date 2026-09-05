@@ -1,9 +1,10 @@
 from llm_sdk.llm_sdk import Small_LLM_Model
 from pydantic import BaseModel
 from cli import loader
+import json
+# from typing import TextIO
 
-names = ['fn_add_numbers', 'fn_greet', 'fn_reverse_string',
-         'fn_get_square_root', 'fn_substitute_string_with_regex']
+names = []
 
 
 class ParameterInfo(BaseModel):
@@ -67,11 +68,17 @@ def build_parameter_schema(fn_name: str,
             return fn.parameters
     raise ValueError("There is no function like that")
 
-# def load_function_definitions(path):
-#     try:
-#         with open(path, 'r') as p:
-#             loader()
-            
+
+def load_function_definitions(path: str) -> list[FunctionEntry]:
+    with open(path, 'r',  encoding='utf-8') as p:
+        loader()
+        ls = json.load(p)
+        for i in range(len(ls)):
+            model_v = FunctionEntry.model_validate(ls[i])
+            if isinstance(model_v, FunctionEntry):
+                names.append(ls[i]['name'])
+        return names
+
 if __name__ == "__main__":
     print(is_valid("e", "fn_gre", names))
     print(is_valid("et", "fn_gre", names))
@@ -84,3 +91,4 @@ if __name__ == "__main__":
     print("double dash (False):", is_valid_integer_continuation("-", "-"))
     print("dash mid (False):", is_valid_integer_continuation("-", "5"))
     print("junk (False):", is_valid_integer_continuation("x", "5"))
+    load_function_definitions("../input/functions_definition.json")
