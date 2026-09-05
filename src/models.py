@@ -91,5 +91,5 @@ if __name__ == "__main__":
     print("double dash (False):", is_valid_integer_continuation("-", "-"))
     print("dash mid (False):", is_valid_integer_continuation("-", "5"))
     print("junk (False):", is_valid_integer_continuation("x", "5"))
-    print("junk (False):", is_valid_integer_continuation("x", "6"))
+    print("junk (False):", is_valid_integer_continuation("x", "65"))
     load_function_definitions("../input/functions_definition.json")
