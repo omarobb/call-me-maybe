@@ -13,9 +13,9 @@ def loader():
                         default="data/output/function_calls.json")
     args = parser.parse_args()
     fun_d.append(load_function_definitions(args.functions_definition))
-    fun_d.append(load_function_definitions(args.input))
-    fun_d.append(load_function_definitions(args.output))
+    fun_d.append(args.input)
 #    print(fun_d)
     # print(args.input)
     # print(args.output)
     # print(args.functions_definition)
+    return fun_d
