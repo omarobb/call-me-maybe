@@ -5,18 +5,19 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "llm_sdk",
     "argparse>=1.4.0",
     "flake8>=7.3.0",
-    "huggingface-hub>=1.29.0",
     "mypy>=2.3.1",
     "numpy>=2.5.2",
     "pydantic>=2.13.5",
-    "torch>=2.13.0",
-    "transformers>=5.16.1",
 ]
 
+[tool.uv.sources]
+llm_sdk = {path = "./llm_sdk/"}
+
 [project.scripts]
-call-me-maybe = "call_me_maybe:main"
+call = "call-me-maybe.src:main"
 
 [tool.uv.build-backend]
 module-name="src"

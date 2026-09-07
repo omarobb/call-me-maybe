@@ -1,4 +1,4 @@
-from llm_sdk.llm_sdk import Small_LLM_Model
+from ..llm_sdk.llm_sdk import Small_LLM_Model
 from pydantic import BaseModel, ValidationError, TypeAdapter
 # from cli import loader
 import sys
