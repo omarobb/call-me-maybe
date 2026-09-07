@@ -1,7 +1,6 @@
 import argparse
-import json 
-import sys
-from models import load_function_definitions, FunctionEntry
+from .models import load_function_definitions
+
 
 def loader():
     parser = argparse.ArgumentParser()
@@ -16,7 +15,7 @@ def loader():
     fun_d.append(load_function_definitions(args.functions_definition))
     fun_d.append(load_function_definitions(args.input))
     fun_d.append(load_function_definitions(args.output))
-    print(fun_d)
-    print(args.input)
-    print(args.output)
-    print(args.functions_definition)
+#    print(fun_d)
+    # print(args.input)
+    # print(args.output)
+    # print(args.functions_definition)
