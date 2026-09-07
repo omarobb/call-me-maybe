@@ -5,6 +5,7 @@ import sys
 import json
 # from typing import TextIO
 
+  
 class ParameterInfo(BaseModel):
     type: str
 
@@ -70,13 +71,15 @@ def build_parameter_schema(fn_name: str,
 def load_function_definitions(path: str) -> list[FunctionEntry]:
 
     try:
-        with open(path, 'r',  encoding='utf-8') as p:
+        with open(path, 'r', encoding='utf-8') as p:
             ls = json.load(p)
             validation = TypeAdapter(list[FunctionEntry])
             return validation.validate_python(ls)
-    except (json.JSONDecodeError, FileNotFoundError, TypeError, ValidationError) as e:
+    except (json.JSONDecodeError, FileNotFoundError,
+            TypeError, ValidationError) as e:
         print(f"ERROR in JSON syntax: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     # print(is_valid("e", "fn_gre", names))
@@ -91,4 +94,4 @@ if __name__ == "__main__":
     print("dash mid (False):", is_valid_integer_continuation("-", "5"))
     print("junk (False):", is_valid_integer_continuation("x", "5"))
     print("junk (False):", is_valid_integer_continuation("x", "65"))
-    load_function_definitions("../input/functions_definition.json")
+    load_function_definitions("data/input/functions_definition.json")
