@@ -17,6 +17,10 @@ class FunctionEntry(BaseModel):
     returns: ParameterInfo
 
 
+class Prompt(BaseModel):
+    prompt: str
+
+
 def sdk() -> None:
 
     sdk = Small_LLM_Model()
@@ -77,7 +81,20 @@ def load_function_definitions(path: str) -> list[FunctionEntry]:
             return validation.validate_python(ls)
     except (json.JSONDecodeError, FileNotFoundError,
             TypeError, ValidationError) as e:
-        print(f"ERROR in JSON syntax: {e}")
+        print(f"ERROR in function_definitions: {e}")
+        sys.exit(1)
+
+
+def load_prompt_definitions(path: str) -> list[Prompt]:
+
+    try:
+        with open(path, 'r', encoding='utf-8') as p:
+            ls = json.load(p)
+            validation = TypeAdapter(list[Prompt])
+            return validation.validate_python(ls)
+    except (json.JSONDecodeError, FileNotFoundError,
+            TypeError, ValidationError) as e:
+        print(f"ERROR in prompt_definitions: {e}")
         sys.exit(1)
 
 
