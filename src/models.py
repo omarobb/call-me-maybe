@@ -5,7 +5,13 @@ import sys
 import json
 # from typing import TextIO
 
-  
+
+class FunctionCallResult:
+    prompt: str
+    name: str
+    parameters: dict[str, ParameterInfo]
+
+
 class ParameterInfo(BaseModel):
     type: str
 
