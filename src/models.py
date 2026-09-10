@@ -6,12 +6,6 @@ import json
 # from typing import TextIO
 
 
-class FunctionCallResult:
-    prompt: str
-    name: str
-    parameters: dict[str, ParameterInfo]
-
-
 class ParameterInfo(BaseModel):
     type: str
 
@@ -25,6 +19,12 @@ class FunctionEntry(BaseModel):
 
 class Prompt(BaseModel):
     prompt: str
+
+
+# class FunctionCallResult(BaseModel):
+#     prompt: str
+#     name: str
+#     parameters: dict[str, ParameterInfo]
 
 
 def sdk() -> None:
