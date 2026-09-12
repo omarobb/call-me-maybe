@@ -55,13 +55,13 @@ def sdk() -> None:
     print(best_index, best_value, sdk.decode([best_index]))
 
 
-def is_valid(s: str, typed: str, valid: list[str]) -> bool:
+def is_valid(s: str, typed: str, valid: list[str]) -> int:
     count = 0
     for d in valid:
         if d.startswith(typed+s):
-            if d in valid:
+            if d == typed + s:
                 count += 1
-    return count > 0
+    return count
 
     # return any(d for d in valid if d.startswith(typed + s))
 
