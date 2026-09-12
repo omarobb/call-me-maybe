@@ -56,7 +56,14 @@ def sdk() -> None:
 
 
 def is_valid(s: str, typed: str, valid: list[str]) -> bool:
-    return any(d for d in valid if d.startswith(typed + s))
+    count = 0
+    for d in valid:
+        if d.startswith(typed+s):
+            if d in valid:
+                count += 1
+    return count > 0
+
+    # return any(d for d in valid if d.startswith(typed + s))
 
 
 def is_valid_integer_continuation(s: str, typed: str) -> bool:
