@@ -4,11 +4,21 @@ path = $(shell pwd)
 all: env run
 
 env:
-	cd /goinfre/$(USER)/ &&\
-	mkdir call -p && \
-	cd call && \
-	python3 -m venv .venv && \
-	ln -s -f /goinfre/$(USER)/call/.venv $(path)
+	@echo "Are you on 42 device [y|n]"; \
+	read d; \
+	if ["$$d" = "y"]; then
+		cd /goinfre/$(USER)/ &&\
+		mkdir call -p && \
+		cd call && \
+		python3 -m venv .venv && \
+		ln -s -f /goinfre/$(USER)/call/.venv $(path)
+	fi
+	if ["$$d" = "n"]; then	
+		mkdir call -p && \
+		cd call_me_maybe && \
+		python3 -m venv .venv && \
+		ln -s -f /goinfre/$(USER)/call_me_maybe/.venv $(path)
+	fi
 	export UV_LINK_MODE=copy
 
 install:
