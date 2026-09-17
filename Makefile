@@ -4,7 +4,7 @@ path = $(shell pwd)
 all: env run
 
 env:
-	cd /goinfre/$(USER)/ &&\
+	cd /goinfre/$(USER)/ &&\ 
 	mkdir call -p && \
 	cd call && \
 	python3 -m venv .venv && \
