@@ -6,19 +6,18 @@ all: run
 env:
 	@echo "Are you on 42 device [y|n]"; \
 	read d; \
-	if ["$$d" = "y"]; then \
+	ifneq ($(d),y)
 		cd /goinfre/$(USER)/ &&\
 		mkdir call -p && \
 		cd call && \
 		python3 -m venv .venv && \
 		ln -s -f /goinfre/$(USER)/call/.venv $(path) &&\
-		export UV_LINK_MODE=copy &&\
-	fi \
-	if ["$$d" = "n"]; then \	
+		export UV_LINK_MODE=copy
+	else
 		mkdir call_me_maybe -p && \
 		cd call_me_maybe && \
-		python3 -m venv .venv &&\
-	fi \
+		python3 -m venv .venv 
+	endif
 
 install:
 	curl -LsSf https://astral.sh/uv/install.sh | sh
