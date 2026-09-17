@@ -1,24 +1,24 @@
 .PHONY: install env run clean debug lint 
 path = $(shell pwd)
 
-all: env run
+all: run
 
 env:
 	@echo "Are you on 42 device [y|n]"; \
 	read d; \
-	if ["$$d" = "y"]; then\
+	if ["$$d" = "y"]; then \
 		cd /goinfre/$(USER)/ &&\
 		mkdir call -p && \
 		cd call && \
 		python3 -m venv .venv && \
-		ln -s -f /goinfre/$(USER)/call/.venv $(path)
-	fi
+		ln -s -f /goinfre/$(USER)/call/.venv $(path) &&\
+		export UV_LINK_MODE=copy &&\
+	fi \
 	if ["$$d" = "n"]; then \	
-		mkdir call -p && \
+		mkdir call_me_maybe -p && \
 		cd call_me_maybe && \
-		python3 -m venv .venv
-	fi
-	export UV_LINK_MODE=copy
+		python3 -m venv .venv &&\
+	fi \
 
 install:
 	curl -LsSf https://astral.sh/uv/install.sh | sh
