@@ -55,15 +55,20 @@ def  sdk() -> None:
     print(best_index, best_value, sdk.decode([best_index]))
 
 
-def correct_token(s: str, valid: list[str]) -> bool:
-    for d in valid:
-        if d.startswith(s):
-            return True
-    return False
+def is_complete_name(typed: str, valid: list[str]) -> bool:
+    return any(name for name in valid if typed == name)
 
 
 def is_valid(s: str, typed: str, valid: list[str]) -> bool:
     return any(d for d in valid if d.startswith(typed + s))
+
+
+def is_name_token_allowed(candidate_token: str,
+                          typed: str, valid: list[str]) -> bool:
+    if candidate_token == '"':
+        return is_complete_name(typed, valid)
+    else:
+        return is_valid(candidate_token, typed, valid)
 
 
 def is_valid_integer_continuation(s: str, typed: str) -> bool:
@@ -109,6 +114,7 @@ def load_prompt_definitions(path: str) -> list[Prompt]:
             TypeError, ValidationError) as e:
         print(f"ERROR in prompt_definitions: {e}")
         sys.exit(1)
+
 
 
 if __name__ == "__main__":
