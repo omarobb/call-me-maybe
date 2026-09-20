@@ -73,14 +73,11 @@ def is_name_token_allowed(candidate_token: str,
 
 def is_valid_string_continuation(s: str) -> bool:
     count = 0
-    if not s.endswith('"'):
+    if not s.endswith('""'):
         return False
-    for i in s:
-        try:
-            if s.find('"'):
-                count += 1
-        except ValueError:
-            continue
+    for i, sc in enumerate(s):
+        if s[i] == '""':
+            count += 1
     if count > 1:
         return False
 
