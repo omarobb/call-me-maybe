@@ -122,7 +122,7 @@ def build_token_loockup(sdk: Small_LLM_Model) -> dict[int, str]:
     log = sdk.get_logits_from_input_ids(ids)
     vocab_size = len(log)
     lookup = {}
-    for token_id in range(0, vocab_size-1):
+    for token_id in range(vocab_size):
         lookup[token_id] = sdk.decode([token_id])
     return lookup
      
