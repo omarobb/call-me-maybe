@@ -138,6 +138,21 @@ def build_token_loockup(sdk: Small_LLM_Model) -> dict[int, str]:
         lookup[token_id] = sdk.decode([token_id])
     return lookup
 
+
+def build_priming_text(prompt_text: str, function_defs: list[FunctionEntry]) -> str:
+    instruction = (
+        "You are a function-calling assistant. Given a user request and "
+        "a list of available functions with their parameters, choose "
+        "exactly one function and extract its arguments from the request. "
+        "Respond with a JSON object of the form "
+        '{"name": <function name>, "parameters": {...}}.'
+    )
+
+    function_json = TypeAdapter(list[FunctionEntry]).dump_json(function_defs)
+
+    return f"{instruction} \n\n Available functions: \n"\
+           f"{function_json}\n\n User request: \n{prompt_text}\n\n"
+
 if __name__ == "__main__":
     # print(is_valid("e", "fn_gre", names))
     # print(is_valid("et", "fn_gre", names))
