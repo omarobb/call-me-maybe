@@ -71,6 +71,24 @@ def is_name_token_allowed(candidate_token: str,
         return is_valid(candidate_token, typed, valid)
 
 
+def is_valid_string_continuation(s: str) -> bool:
+    count = 0
+    if not s.endswith('"'):
+        return False
+    for i in s:
+        try:
+            if s.find('"'):
+                count += 1
+        except ValueError:
+            continue
+    if count > 1:
+        return False
+
+    if s.endswith("\\"):
+        return False
+    return True
+
+
 def is_valid_integer_continuation(s: str, typed: str) -> bool:
     if s == '-' or s == '':
         if not typed:
