@@ -137,8 +137,6 @@ def build_token_loockup(sdk: Small_LLM_Model) -> dict[int, str]:
     for token_id in range(vocab_size):
         lookup[token_id] = sdk.decode([token_id])
     return lookup
-     
-
 
 if __name__ == "__main__":
     # print(is_valid("e", "fn_gre", names))

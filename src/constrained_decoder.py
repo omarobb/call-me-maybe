@@ -1,6 +1,8 @@
 from enum import Enum
-from llm_sdk import Small_LLM_Model
-from models import is_name_token_allowed, is_valid_integer_continuation, is_valid_string_continuation
+# from llm_sdk import Small_LLM_Model
+from models import (is_name_token_allowed,
+                    is_valid_integer_continuation,
+                    is_valid_string_continuation)
 from math import inf
 
 
@@ -10,9 +12,9 @@ class GenState(Enum):
     IN_PARAMETER_VALUE_NUMBER = "in_parameter_value_number"
 
 
-def  mask_logits(logits: list[float], typed: str, state: GenState,
-                 valid_name: list[str],
-                 token_lookup: dict[int, str]) -> list[float]:
+def mask_logits(logits: list[float], typed: str, state: GenState,
+                valid_name: list[str],
+                token_lookup: dict[int, str]) -> list[float]:
     masked = logits.copy()
 
     for token_ids, score in enumerate(logits):
@@ -27,7 +29,7 @@ def  mask_logits(logits: list[float], typed: str, state: GenState,
             allowed = is_valid_integer_continuation(condidate_string, typed)
 
         if not allowed:
-            masked[token_ids] = -inf 
+            masked[token_ids] = -inf
 
     return masked
 
