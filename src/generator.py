@@ -23,6 +23,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
         if state == GenState.IN_PARAMETER_VALUE_NUMBER\
                 and best_token_str in (',', '}'):
             current_ids.pop()
+            typed = typed[0:-1]
             break
     return (current_ids, typed)
 
