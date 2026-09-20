@@ -24,7 +24,7 @@ class Prompt(BaseModel):
 # class FunctionCallResult(BaseModel):
 #     prompt: str
 #     name: str
-#     parameters: dict[str, ParameterInfo]
+#   z  parameters: dict[str, ParameterInfo]
 
 
 def  sdk() -> None:
@@ -56,7 +56,7 @@ def  sdk() -> None:
 
 
 def is_complete_name(typed: str, valid: list[str]) -> bool:
-    return any(name for name in valid if typed == name)
+    return typed in valid
 
 
 def is_valid(s: str, typed: str, valid: list[str]) -> bool:
@@ -115,6 +115,17 @@ def load_prompt_definitions(path: str) -> list[Prompt]:
         print(f"ERROR in prompt_definitions: {e}")
         sys.exit(1)
 
+
+def build_token_loockup(sdk: Small_LLM_Model) -> dict[int, str]:
+    ids = sdk.encode('a')
+    ids = ids.tolist()[0]
+    log = sdk.get_logits_from_input_ids(ids)
+    vocab_size = len(log)
+    lookup = {}
+    for token_id in range(0, vocab_size-1):
+        lookup[token_id] = sdk.decode([token_id])
+    return lookup
+     
 
 
 if __name__ == "__main__":
