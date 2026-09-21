@@ -3,7 +3,8 @@ from .constrained_decoder import GenState, mask_logits
 from typing import Any
 from .models import (build_priming_text, FunctionEntry,
                      build_parameter_schema,
-                     FunctionCallResult)
+                     FunctionCallResult,
+                     has_repeating_tail)
 import time
 import re
 
@@ -18,7 +19,9 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
         start = time.time()
         logits = sdk.get_logits_from_input_ids(current_ids)
         print(f"step took {time.time()-start:.2f}s, seq len {len(current_ids)}, typed so far: {typed!r}")
-        masked = mask_logits(logits, field_typed, state, valid_name, token_lookup)
+
+        masked = mask_logits(logits, field_typed,
+                             state, valid_name, token_lookup)
         h_token_id = masked.index(max(masked))
         best_token_str = token_lookup[h_token_id]
         current_ids.append(h_token_id)
@@ -30,6 +33,9 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                 else:
                     best_token_str = '}'
         field_typed += best_token_str
+        for block_size in [1, 2, 3, 5, 8, 10, 15, 20]:
+            if has_repeating_tail(field_typed, block_size):
+                break
 
         if state == GenState.IN_FUNCTION_NAME and best_token_str == '"':
             typed = typed[0:-1]

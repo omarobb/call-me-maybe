@@ -136,3 +136,12 @@ def build_priming_text(prompt_text: str, function_defs: list[FunctionEntry]) -> 
 
     return f"{instruction} \n\n Available functions: \n"\
            f"{function_json}\n\n User request: \n{prompt_text}\n\n"
+
+
+def has_repeating_tail(field_typed: str, block_size: int) -> bool:
+    if len(field_typed) > block_size * 2:
+        return False
+
+    last_block = field_typed[-block_size:]
+    previous_block = field_typed[-block_size*2: -block_size]
+    return last_block == previous_block
