@@ -9,8 +9,8 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                    typed: str, state: GenState,
                    valid_name: list[str],
                    token_lookup: dict[int, str]) -> tuple[list[int], str]:
+    field_typed = ""
     while True:
-        field_typed = ""
         start = time.time()          # <- reset every iteration, not once outside
         logits = sdk.get_logits_from_input_ids(current_ids)
         print(f"step took {time.time()-start:.2f}s, seq len {len(current_ids)}, typed so far: {typed!r}")
@@ -22,7 +22,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
         field_typed += best_token_str
 
         if state == GenState.IN_FUNCTION_NAME and best_token_str == '"':
-            # typed = typed[0:-1]
+            typed = typed[0:-1]
             break
         if state == GenState.IN_PARAMETER_VALUE_STRING \
                 and best_token_str == '"':
