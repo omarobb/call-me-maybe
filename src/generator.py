@@ -1,6 +1,10 @@
 from llm_sdk import Small_LLM_Model
 from constrained_decoder import GenState, mask_logits
-from models import build_token_loockup, build_priming_text, FunctionEntry, build_parameter_schema
+from models import (build_token_loockup, build_priming_text,
+                    FunctionEntry, build_parameter_schema,
+                    FunctionCallResult)
+import re
+import ast
 
 def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                    typed: str, state: GenState,
@@ -31,10 +35,11 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
 
 def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
                       function_defs: list[FunctionEntry],
-                      valid_names: list[str], token_lookup: dict[int, str]):
+                      valid_names: list[str],
+                      token_lookup: dict[int, str]) -> FunctionCallResult:
 
     priming_txt = build_priming_text(prompt_txt, function_defs)
-    typed = '{\"name\": \"'
+    typed = '{"name": "'
     current_ids = sdk.encode(priming_txt + typed).tolist()[0]
 
     current_ids, typed = generate_field(sdk, current_ids, typed,
@@ -43,12 +48,29 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
     
     function_name = typed.split('"')[3]
     schema = build_parameter_schema(function_name, function_defs)
-    typed = typed + '\", \"parameters\": {'
+    typed = typed + '", "parameters": {'
     current_ids = sdk.encode(priming_txt + typed).tolist()[0]
-    
+    parameters = {}
+    dict_data = ""
+    for i, (key, value) in enumerate(schema.items()):
+        typed = typed + '"' + key + '": '
+        if value.type == 'string':
+            typed += '"'
+        current_ids = sdk.encode(priming_txt+typed).tolist()[0]
+        state = GenState.IN_PARAMETER_VALUE_STRING \
+            if value.type == 'string' else GenState.IN_PARAMETER_VALUE_NUMBER
+        current_ids, typed = generate_field(sdk, current_ids, typed,
+                                            state, valid_names, token_lookup)
+        try:
+            dict_data = ast.literal_eval(typed)
+            parameters[key] = dict_data["parameter"][key]
+        except ValueError:
+            continue
 
+        if i < len(schema)-1:
+            typed += ', '
+            current_ids = sdk.encode(priming_txt + typed).tolist()[0]
+    typed += '}}'
 
-
-
-
-    
+    return FunctionCallResult(prompt=prompt_txt,
+                              name=function_name, parameters=parameters)

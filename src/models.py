@@ -21,10 +21,10 @@ class Prompt(BaseModel):
     prompt: str
 
 
-# class FunctionCallResult(BaseModel):
-#     prompt: str
-#     name: str
-#   z  parameters: dict[str, ParameterInfo]
+class FunctionCallResult(BaseModel):
+    prompt: str
+    name: str
+    parameters: dict[str, ParameterInfo]
 
 
 def  sdk() -> None:
