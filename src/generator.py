@@ -1,10 +1,9 @@
 from llm_sdk import Small_LLM_Model
 from constrained_decoder import GenState, mask_logits
-from models import (build_token_loockup, build_priming_text,
-                    FunctionEntry, build_parameter_schema,
+from models import (build_priming_text, FunctionEntry,
+                    build_parameter_schema,
                     FunctionCallResult)
-import re
-import ast
+
 
 def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                    typed: str, state: GenState,
@@ -45,13 +44,12 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
     current_ids, typed = generate_field(sdk, current_ids, typed,
                                         GenState.IN_FUNCTION_NAME,
                                         valid_names, token_lookup)
-    
+
     function_name = typed.split('"')[3]
     schema = build_parameter_schema(function_name, function_defs)
     typed = typed + '", "parameters": {'
     current_ids = sdk.encode(priming_txt + typed).tolist()[0]
     parameters = {}
-    dict_data = ""
     for i, (key, value) in enumerate(schema.items()):
         typed = typed + '"' + key + '": '
         if value.type == 'string':
@@ -59,11 +57,15 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
         current_ids = sdk.encode(priming_txt+typed).tolist()[0]
         state = GenState.IN_PARAMETER_VALUE_STRING \
             if value.type == 'string' else GenState.IN_PARAMETER_VALUE_NUMBER
+        typed_b = typed
         current_ids, typed = generate_field(sdk, current_ids, typed,
                                             state, valid_names, token_lookup)
+        r_value = typed[len(typed_b):]
         try:
-            dict_data = ast.literal_eval(typed)
-            parameters[key] = dict_data["parameter"][key]
+            if value.type == 'string':
+                parameters[key] = r_value.rstrip('"')
+            else:
+                parameters[key] = int(r_value)
         except ValueError:
             continue
 
