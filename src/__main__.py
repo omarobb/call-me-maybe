@@ -6,9 +6,13 @@ from .generator import generate_one_call
 if __name__ == "__main__":
     sdk = Small_LLM_Model()
     prompt = load_prompt_definitions('data/input/function_calling_tests.json')
-    for pro in prompt:
-        print(generate_one_call(sdk, pro.prompt,
-                                load_function_definitions('data/input/functions_definition.json'),
-                                load_function_name('data/input/functions_definition.json'),
-                                build_token_loockup(sdk)))
+    # for pro in prompt:
+    #     print(generate_one_call(sdk, pro.prompt,
+    #                             load_function_definitions('data/input/functions_definition.json'),
+    #                             load_function_name('data/input/functions_definition.json'),
+    #                             build_token_loockup(sdk)))
     
+    print(generate_one_call(sdk, "Replace all numbers in \"Hello 34 I'm 233 years old\" with NUMBERS",
+                            load_function_definitions('data/input/functions_definition.json'),
+                            load_function_name('data/input/functions_definition.json'),
+                            build_token_loockup(sdk)))

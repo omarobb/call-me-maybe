@@ -139,7 +139,7 @@ def build_priming_text(prompt_text: str, function_defs: list[FunctionEntry]) -> 
 
 
 def has_repeating_tail(field_typed: str, block_size: int) -> bool:
-    if len(field_typed) > block_size * 2:
+    if len(field_typed) < block_size * 2:
         return False
 
     last_block = field_typed[-block_size:]
