@@ -16,7 +16,7 @@ def mask_logits(logits: list[float], typed: str, state: GenState,
                 valid_name: list[str],
                 token_lookup: dict[int, str]) -> list[float]:
     masked = logits.copy()
-    print('masked')
+
     for token_ids, score in enumerate(logits):
         condidate_string = token_lookup[token_ids]
 

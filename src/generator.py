@@ -3,20 +3,23 @@ from .constrained_decoder import GenState, mask_logits
 from .models import (build_priming_text, FunctionEntry,
                      build_parameter_schema,
                      FunctionCallResult)
-
+import time
 
 def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                    typed: str, state: GenState,
                    valid_name: list[str],
                    token_lookup: dict[int, str]) -> tuple[list[int], str]:
-    print('generate_field')
     while True:
+        field_typed = ""
+        start = time.time()          # <- reset every iteration, not once outside
         logits = sdk.get_logits_from_input_ids(current_ids)
-        masked = mask_logits(logits, typed, state, valid_name, token_lookup)
+        print(f"step took {time.time()-start:.2f}s, seq len {len(current_ids)}, typed so far: {typed!r}")
+        masked = mask_logits(logits, field_typed, state, valid_name, token_lookup)
         h_token_id = masked.index(max(masked))
         best_token_str = token_lookup[h_token_id]
         current_ids.append(h_token_id)
         typed = typed+best_token_str
+        field_typed += best_token_str
 
         if state == GenState.IN_FUNCTION_NAME and best_token_str == '"':
             # typed = typed[0:-1]
@@ -28,6 +31,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                 and best_token_str in (',', '}'):
             current_ids.pop()
             typed = typed[0:-1]
+            field_typed = field_typed[0:-1]
             break
     return (current_ids, typed)
 
@@ -36,7 +40,6 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
                       function_defs: list[FunctionEntry],
                       valid_names: list[str],
                       token_lookup: dict[int, str]) -> FunctionCallResult:
-    print('generate_one_call')
     priming_txt = build_priming_text(prompt_txt, function_defs)
     typed = '{"name": "'
     current_ids = sdk.encode(priming_txt + typed).tolist()[0]
