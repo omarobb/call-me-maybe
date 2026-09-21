@@ -1,17 +1,22 @@
 from llm_sdk import Small_LLM_Model
 from .constrained_decoder import GenState, mask_logits
+from typing import Any
 from .models import (build_priming_text, FunctionEntry,
                      build_parameter_schema,
-                     FunctionCallResult)
+                     FunctionCallResult,
+                     ParameterInfo)
 import time
+import re
+
 
 def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                    typed: str, state: GenState,
                    valid_name: list[str],
-                   token_lookup: dict[int, str]) -> tuple[list[int], str]:
+                   token_lookup: dict[int, str],
+                   int_value: list[Any]) -> tuple[list[int], str]:
     field_typed = ""
     while True:
-        start = time.time()          # <- reset every iteration, not once outside
+        start = time.time()
         logits = sdk.get_logits_from_input_ids(current_ids)
         print(f"step took {time.time()-start:.2f}s, seq len {len(current_ids)}, typed so far: {typed!r}")
         masked = mask_logits(logits, field_typed, state, valid_name, token_lookup)
@@ -19,6 +24,12 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
         best_token_str = token_lookup[h_token_id]
         current_ids.append(h_token_id)
         typed = typed+best_token_str
+        if field_typed and field_typed.isdigit():
+            if any(v for v in int_value if int(field_typed) == int(v) or float(field_typed) == int(v)):
+                if len(int_value) > 1:
+                    best_token_str = ','
+                else:
+                    best_token_str = '}'
         field_typed += best_token_str
 
         if state == GenState.IN_FUNCTION_NAME and best_token_str == '"':
@@ -40,19 +51,20 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
                       function_defs: list[FunctionEntry],
                       valid_names: list[str],
                       token_lookup: dict[int, str]) -> FunctionCallResult:
+    int_value = re.findall(r'\d+', prompt_txt)
+
     priming_txt = build_priming_text(prompt_txt, function_defs)
     typed = '{"name": "'
     current_ids = sdk.encode(priming_txt + typed).tolist()[0]
-
     current_ids, typed = generate_field(sdk, current_ids, typed,
                                         GenState.IN_FUNCTION_NAME,
-                                        valid_names, token_lookup)
+                                        valid_names, token_lookup, int_value)
 
     function_name = typed.split('"')[3]
     schema = build_parameter_schema(function_name, function_defs)
     typed = typed + '", "parameters": {'
     current_ids = sdk.encode(priming_txt + typed).tolist()[0]
-    parameters = {}
+    parameters: dict[str, ParameterInfo] = {}
     for i, (key, value) in enumerate(schema.items()):
         typed = typed + '"' + key + '": '
         if value.type == 'string':
@@ -62,20 +74,22 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
             if value.type == 'string' else GenState.IN_PARAMETER_VALUE_NUMBER
         typed_b = typed
         current_ids, typed = generate_field(sdk, current_ids, typed,
-                                            state, valid_names, token_lookup)
+                                            state, valid_names, token_lookup, int_value)
         r_value = typed[len(typed_b):]
+
         try:
             if value.type == 'string':
-                parameters[key] = r_value.rstrip('"')
+                parameters[key] = ParameterInfo(type=r_value.rstrip('"'))
             else:
-                parameters[key] = int(r_value)
+                parameters[key] = ParameterInfo(type=int(r_value))
         except ValueError:
-            continue
+            break
 
         if i < len(schema)-1:
             typed += ', '
             current_ids = sdk.encode(priming_txt + typed).tolist()[0]
     typed += '}}'
+    print(typed)
 
     return FunctionCallResult(prompt=prompt_txt,
                               name=function_name, parameters=parameters)

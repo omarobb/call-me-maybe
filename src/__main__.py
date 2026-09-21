@@ -11,7 +11,7 @@ if __name__ == "__main__":
     # build_token_loockup(sdk)
     # print(loader())
     sdk = Small_LLM_Model()
-    print(generate_one_call(sdk, "What is the sum of 2 and 3?",
+    print(generate_one_call(sdk, "What is the sum of 22 and 3?",
                             load_function_definitions('data/input/functions_definition.json'),
                             load_function_name('data/input/functions_definition.json'),
                             build_token_loockup(sdk)))

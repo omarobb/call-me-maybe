@@ -3,11 +3,12 @@ from pydantic import BaseModel, ValidationError, TypeAdapter
 # from cli import loader
 import sys
 import json
+from typing import Any
 # from typing import TextIO
 
 
 class ParameterInfo(BaseModel):
-    type: str
+    type: Any
 
 
 class FunctionEntry(BaseModel):
@@ -46,7 +47,7 @@ def  sdk() -> None:
     best_value = None
     best_index = 0
     for idd, val in logits:
-        s = sdk.decode([idd]) 
+        s = sdk.decode([idd])
         if r.startswith(s):
             if best_value is None or val > best_value:
                 best_value = val
@@ -95,9 +96,9 @@ def is_valid_integer_continuation(s: str, typed: str) -> bool:
 def build_parameter_schema(fn_name: str,
                            fn_defintion: list[FunctionEntry])\
                            -> dict[str, ParameterInfo]:
-    for fn in fn_defintion:
-        if fn.name == fn_name:
-            return fn.parameters
+    for fun in fn_defintion:
+        if fun.name == fn_name:
+            return fun.parameters
     raise ValueError("There is no function like that")
 
 
