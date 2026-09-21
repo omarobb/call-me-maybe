@@ -12,7 +12,7 @@ if __name__ == "__main__":
     #                             load_function_name('data/input/functions_definition.json'),
     #                             build_token_loockup(sdk)))
     
-    print(generate_one_call(sdk, "Replace all numbers in \"Hello 34 I'm 233 years old\" with NUMBERS",
+    print(generate_one_call(sdk, "Replace all vowels in 'Programming is fun' with asterisks",
                             load_function_definitions('data/input/functions_definition.json'),
                             load_function_name('data/input/functions_definition.json'),
                             build_token_loockup(sdk)))
