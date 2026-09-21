@@ -3,8 +3,7 @@ from .constrained_decoder import GenState, mask_logits
 from typing import Any
 from .models import (build_priming_text, FunctionEntry,
                      build_parameter_schema,
-                     FunctionCallResult,
-                     ParameterInfo)
+                     FunctionCallResult)
 import time
 import re
 
@@ -64,7 +63,7 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
     schema = build_parameter_schema(function_name, function_defs)
     typed = typed + '", "parameters": {'
     current_ids = sdk.encode(priming_txt + typed).tolist()[0]
-    parameters: dict[str, ParameterInfo] = {}
+    parameters = {}
     for i, (key, value) in enumerate(schema.items()):
         typed = typed + '"' + key + '": '
         if value.type == 'string':
@@ -79,9 +78,9 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
 
         try:
             if value.type == 'string':
-                parameters[key] = ParameterInfo(type=r_value.rstrip('"'))
+                parameters[key] = r_value.rstrip('"')
             else:
-                parameters[key] = ParameterInfo(type=int(r_value))
+                parameters[key] = int(r_value)
         except ValueError:
             break
 
@@ -89,7 +88,6 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
             typed += ', '
             current_ids = sdk.encode(priming_txt + typed).tolist()[0]
     typed += '}}'
-    print(typed)
 
     return FunctionCallResult(prompt=prompt_txt,
                               name=function_name, parameters=parameters)

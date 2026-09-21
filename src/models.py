@@ -3,12 +3,16 @@ from pydantic import BaseModel, ValidationError, TypeAdapter
 # from cli import loader
 import sys
 import json
-from typing import Any
+# from typing import Any
 # from typing import TextIO
 
 
 class ParameterInfo(BaseModel):
-    type: Any
+    type: str
+
+
+class Prompt(BaseModel):
+    prompt: str
 
 
 class FunctionEntry(BaseModel):
@@ -18,42 +22,10 @@ class FunctionEntry(BaseModel):
     returns: ParameterInfo
 
 
-class Prompt(BaseModel):
-    prompt: str
-
-
 class FunctionCallResult(BaseModel):
     prompt: str
     name: str
-    parameters: dict[str, ParameterInfo]
-
-
-def  sdk() -> None:
-
-    sdk = Small_LLM_Model()
-
-    test: str = "name\": \"fn_gre"
-
-    f = []
-    # for n in :
-    #     if n.startswith('fn_gre'):
-    #         f.append(n)
-    print(f)
-    ids = sdk.encode(test)
-    ids = ids.tolist()
-    ids = ids[0]
-    logits = enumerate(sdk.get_logits_from_input_ids(ids))
-    r = "et"
-    best_value = None
-    best_index = 0
-    for idd, val in logits:
-        s = sdk.decode([idd])
-        if r.startswith(s):
-            if best_value is None or val > best_value:
-                best_value = val
-                best_index = idd
-
-    print(best_index, best_value, sdk.decode([best_index]))
+    parameters: dict[str, (int | str)]
 
 
 def is_complete_name(typed: str, valid: list[str]) -> bool:
@@ -127,6 +99,7 @@ def load_function_name(path: str) -> list[str]:
         print(f"ERROR in function_definitions: {e}")
         sys.exit(1)
 
+
 def load_prompt_definitions(path: str) -> list[Prompt]:
     try:
         with open(path, 'r', encoding='utf-8') as p:
@@ -163,18 +136,3 @@ def build_priming_text(prompt_text: str, function_defs: list[FunctionEntry]) -> 
 
     return f"{instruction} \n\n Available functions: \n"\
            f"{function_json}\n\n User request: \n{prompt_text}\n\n"
-
-# if __name__ == "__main__":
-#     # print(is_valid("e", "fn_gre", names))
-#     # print(is_valid("et", "fn_gre", names))
-#     # print(is_valid("x", "fn_gre", names))
-#     # print(is_valid("fn_greet", "", names))
-#     # print(is_valid("fn_greeting", "", names))
-#     print("empty+digit (True):", is_valid_integer_continuation("5", ""))
-#     print("neg then digit (True):", is_valid_integer_continuation("5", "-"))
-#     print("dash first (True):", is_valid_integer_continuation("-", ""))
-#     print("double dash (False):", is_valid_integer_continuation("-", "-"))
-#     print("dash mid (False):", is_valid_integer_continuation("-", "5"))
-#     print("junk (False):", is_valid_integer_continuation("x", "5"))
-#     print("junk (False):", is_valid_integer_continuation("x", "65"))
-#     load_function_definitions("data/input/functions_definition.json")
