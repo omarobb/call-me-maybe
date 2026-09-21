@@ -56,15 +56,18 @@ def  sdk() -> None:
 
 
 def is_complete_name(typed: str, valid: list[str]) -> bool:
+    print('is_complete_name')
     return typed in valid
 
 
 def is_valid(s: str, typed: str, valid: list[str]) -> bool:
+    print('is_valid')
     return any(d for d in valid if d.startswith(typed + s))
 
 
 def is_name_token_allowed(candidate_token: str,
                           typed: str, valid: list[str]) -> bool:
+    print('is_name_token_allowed')
     if candidate_token == '"':
         return is_complete_name(typed, valid)
     else:
@@ -72,7 +75,7 @@ def is_name_token_allowed(candidate_token: str,
 
 
 def is_valid_string_continuation(s: str) -> bool:
-
+    print('is_valid_string_continuation')
     if '"' in s:
         if not s[-1] == '"':
             return False
@@ -84,6 +87,7 @@ def is_valid_string_continuation(s: str) -> bool:
 
 
 def is_valid_integer_continuation(s: str, typed: str) -> bool:
+    print('is_valid_integer_continuation')
     if s == '-' or s == '':
         if not typed:
             return True
@@ -96,6 +100,7 @@ def is_valid_integer_continuation(s: str, typed: str) -> bool:
 def build_parameter_schema(fn_name: str,
                            fn_defintion: list[FunctionEntry])\
                            -> dict[str, ParameterInfo]:
+    print('build_parameter_schema')
     for fn in fn_defintion:
         if fn.name == fn_name:
             return fn.parameters
@@ -103,7 +108,7 @@ def build_parameter_schema(fn_name: str,
 
 
 def load_function_definitions(path: str) -> list[FunctionEntry]:
-
+    print('load_function_definitions')
     try:
         with open(path, 'r', encoding='utf-8') as p:
             ls = json.load(p)
@@ -115,8 +120,22 @@ def load_function_definitions(path: str) -> list[FunctionEntry]:
         sys.exit(1)
 
 
-def load_prompt_definitions(path: str) -> list[Prompt]:
+def load_function_name(path: str) -> list[str]:
+    print('load_function_name')
+    try:
+        with open(path, 'r', encoding='utf-8') as p:
+            names = []
+            ls = json.load(p)
+            for fn in ls:
+                names.append(fn['name'])
+            return names
+    except (json.JSONDecodeError, FileNotFoundError,
+            TypeError, ValidationError) as e:
+        print(f"ERROR in function_definitions: {e}")
+        sys.exit(1)
 
+def load_prompt_definitions(path: str) -> list[Prompt]:
+    print('load_prompt_definitions')
     try:
         with open(path, 'r', encoding='utf-8') as p:
             ls = json.load(p)
@@ -129,6 +148,7 @@ def load_prompt_definitions(path: str) -> list[Prompt]:
 
 
 def build_token_loockup(sdk: Small_LLM_Model) -> dict[int, str]:
+    print('build_token_loockup')
     ids = sdk.encode('a')
     ids = ids.tolist()[0]
     log = sdk.get_logits_from_input_ids(ids)
@@ -140,6 +160,7 @@ def build_token_loockup(sdk: Small_LLM_Model) -> dict[int, str]:
 
 
 def build_priming_text(prompt_text: str, function_defs: list[FunctionEntry]) -> str:
+    print('build_priming_text')
     instruction = (
         "You are a function-calling assistant. Given a user request and "
         "a list of available functions with their parameters, choose "
@@ -153,17 +174,17 @@ def build_priming_text(prompt_text: str, function_defs: list[FunctionEntry]) -> 
     return f"{instruction} \n\n Available functions: \n"\
            f"{function_json}\n\n User request: \n{prompt_text}\n\n"
 
-if __name__ == "__main__":
-    # print(is_valid("e", "fn_gre", names))
-    # print(is_valid("et", "fn_gre", names))
-    # print(is_valid("x", "fn_gre", names))
-    # print(is_valid("fn_greet", "", names))
-    # print(is_valid("fn_greeting", "", names))
-    print("empty+digit (True):", is_valid_integer_continuation("5", ""))
-    print("neg then digit (True):", is_valid_integer_continuation("5", "-"))
-    print("dash first (True):", is_valid_integer_continuation("-", ""))
-    print("double dash (False):", is_valid_integer_continuation("-", "-"))
-    print("dash mid (False):", is_valid_integer_continuation("-", "5"))
-    print("junk (False):", is_valid_integer_continuation("x", "5"))
-    print("junk (False):", is_valid_integer_continuation("x", "65"))
-    load_function_definitions("data/input/functions_definition.json")
+# if __name__ == "__main__":
+#     # print(is_valid("e", "fn_gre", names))
+#     # print(is_valid("et", "fn_gre", names))
+#     # print(is_valid("x", "fn_gre", names))
+#     # print(is_valid("fn_greet", "", names))
+#     # print(is_valid("fn_greeting", "", names))
+#     print("empty+digit (True):", is_valid_integer_continuation("5", ""))
+#     print("neg then digit (True):", is_valid_integer_continuation("5", "-"))
+#     print("dash first (True):", is_valid_integer_continuation("-", ""))
+#     print("double dash (False):", is_valid_integer_continuation("-", "-"))
+#     print("dash mid (False):", is_valid_integer_continuation("-", "5"))
+#     print("junk (False):", is_valid_integer_continuation("x", "5"))
+#     print("junk (False):", is_valid_integer_continuation("x", "65"))
+#     load_function_definitions("data/input/functions_definition.json")

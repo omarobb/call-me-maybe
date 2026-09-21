@@ -1,15 +1,15 @@
 from llm_sdk import Small_LLM_Model
-from constrained_decoder import GenState, mask_logits
-from models import (build_priming_text, FunctionEntry,
-                    build_parameter_schema,
-                    FunctionCallResult)
+from .constrained_decoder import GenState, mask_logits
+from .models import (build_priming_text, FunctionEntry,
+                     build_parameter_schema,
+                     FunctionCallResult)
 
 
 def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                    typed: str, state: GenState,
                    valid_name: list[str],
                    token_lookup: dict[int, str]) -> tuple[list[int], str]:
-
+    print('generate_field')
     while True:
         logits = sdk.get_logits_from_input_ids(current_ids)
         masked = mask_logits(logits, typed, state, valid_name, token_lookup)
@@ -36,7 +36,7 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
                       function_defs: list[FunctionEntry],
                       valid_names: list[str],
                       token_lookup: dict[int, str]) -> FunctionCallResult:
-
+    print('generate_one_call')
     priming_txt = build_priming_text(prompt_txt, function_defs)
     typed = '{"name": "'
     current_ids = sdk.encode(priming_txt + typed).tolist()[0]

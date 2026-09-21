@@ -1,8 +1,8 @@
 from enum import Enum
 # from llm_sdk import Small_LLM_Model
-from models import (is_name_token_allowed,
-                    is_valid_integer_continuation,
-                    is_valid_string_continuation)
+from .models import (is_name_token_allowed,
+                     is_valid_integer_continuation,
+                     is_valid_string_continuation)
 from math import inf
 
 
@@ -16,7 +16,7 @@ def mask_logits(logits: list[float], typed: str, state: GenState,
                 valid_name: list[str],
                 token_lookup: dict[int, str]) -> list[float]:
     masked = logits.copy()
-
+    print('masked')
     for token_ids, score in enumerate(logits):
         condidate_string = token_lookup[token_ids]
 
