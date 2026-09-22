@@ -123,7 +123,8 @@ def build_token_loockup(sdk: Small_LLM_Model) -> dict[int, str]:
     return lookup
 
 
-def build_priming_text(prompt_text: str, function_defs: list[FunctionEntry]) -> str:
+def build_priming_text(prompt_text: str,
+                       function_defs: list[FunctionEntry]) -> str:
     instruction = (
         "You are a function-calling assistant. Given a user request and "
         "a list of available functions with their parameters, choose "

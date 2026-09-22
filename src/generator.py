@@ -5,7 +5,6 @@ from .models import (build_priming_text, FunctionEntry,
                      build_parameter_schema,
                      FunctionCallResult,
                      has_repeating_tail)
-import time
 import re
 
 
@@ -17,10 +16,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
     field_typed = ""
     go = True
     while go:
-        start = time.time()
         logits = sdk.get_logits_from_input_ids(current_ids)
-        # print(f"step took {time.time()-start:.2f}s, seq len {len(current_ids)}, typed so far: {typed!r}")
-
         masked = mask_logits(logits, field_typed,
                              state, valid_name, token_lookup)
         h_token_id = masked.index(max(masked))
@@ -28,16 +24,19 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
         current_ids.append(h_token_id)
         typed = typed+best_token_str
         if field_typed and field_typed.isdigit():
-            if any(v for v in int_value if int(field_typed) == int(v) or float(field_typed) == int(v)):
+            if any(v for v in int_value
+                   if int(field_typed) == int(v)
+                   or float(field_typed) == int(v)):
                 if len(int_value) > 1:
                     best_token_str = ','
                 else:
                     best_token_str = '}'
         field_typed += best_token_str
         if state == GenState.IN_PARAMETER_VALUE_STRING:
-            for block_size in [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 15, 17, 18, 19, 20]:
+            for block_size in [1, 2, 3, 5, 6, 7, 8,
+                               9, 10, 11, 15, 17, 18, 19, 20]:
                 if has_repeating_tail(field_typed, block_size):
-                    typed = typed[:-block_size] + '"'
+                    typed = typed[:-block_size-2] + '"'
                     go = False
                     break
         if state == GenState.IN_FUNCTION_NAME and best_token_str == '"':
@@ -58,7 +57,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
 def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
                       function_defs: list[FunctionEntry],
                       valid_names: list[str],
-                      token_lookup: dict[int, str]) -> str:
+                      token_lookup: dict[int, str]) -> FunctionCallResult:
     int_value = re.findall(r'\d+', prompt_txt)
 
     priming_txt = build_priming_text(prompt_txt, function_defs)
@@ -98,6 +97,6 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
             typed += ', '
             current_ids = sdk.encode(priming_txt + typed).tolist()[0]
     typed += '}}'
-    typed = typed[1:]
-    return '{' \
-           f'"prompt": "{prompt_txt}", {typed}'
+
+    return FunctionCallResult(prompt=prompt_txt,
+                              name=function_name, parameters=parameters)
