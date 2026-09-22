@@ -24,6 +24,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
         best_token_str = token_lookup[h_token_id]
         current_ids.append(h_token_id)
         typed = typed+best_token_str
+        
         if field_typed and field_typed.isdigit():
             if any(v for v in int_value
                    if field_typed == v):
@@ -31,13 +32,23 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                     best_token_str = ','
                 else:
                     best_token_str = '}'
+        if state == GenState.IN_PARAMETER_VALUE_FLOAT:
+            if field_typed and field_typed.isdigit():
+                if any(v for v in int_value
+                        if v.startswith(field_typed + '.')):
+                    best_token_str = '.'
+            if any(v for v in int_value
+                    if field_typed == v):
+                if len(int_value) > 1:
+                    best_token_str = ','
+                else:
+                    best_token_str = '}'
         field_typed += best_token_str
-        print(field_typed)
         if state == GenState.IN_PARAMETER_VALUE_STRING:
             for block_size in [3, 5, 6, 7, 8,
                                9, 10, 11, 15, 17, 18, 19, 20]:
                 if has_repeating_tail(field_typed, block_size):
-                    typed = typed[:-block_size] + '"'
+                    typed = typed[:-block_size-1] + '"'
                     go = False
                     break
         if state == GenState.IN_FUNCTION_NAME and best_token_str == '"':
@@ -54,7 +65,6 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
             break
         if state == GenState.IN_PARAMETER_VALUE_FLOAT and best_token_str\
                 in (',', '}'):
-            
             break
     return (current_ids, typed)
 
@@ -65,11 +75,10 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
                       token_lookup: dict[int, str]) -> FunctionCallResult:
     int_value = re.findall(r'\d+.\d+', prompt_txt)
     for i in re.findall(r'\d+', prompt_txt):
-        for j in int_value:
-            if not int(i) == int(float(j)):
-                if i not in int_value:
-                    int_value.append(i)
-    print(int_value)
+        if any(int(float(f)) == int(i) for f in int_value):
+            continue
+        else:
+            int_value.append(i)
 
     priming_txt = build_priming_text(prompt_txt, function_defs)
     typed = '{"name": "'
@@ -88,14 +97,18 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
         if value.type == 'string':
             typed += '"'
         current_ids = sdk.encode(priming_txt+typed).tolist()[0]
-        state = GenState.IN_PARAMETER_VALUE_STRING \
-            if value.type == 'string' else GenState.IN_PARAMETER_VALUE_NUMBER
+        state = 0
+        if value.type == 'string':
+            state = GenState.IN_PARAMETER_VALUE_STRING
+        elif value.type == 'integer':
+            state = GenState.IN_PARAMETER_VALUE_NUMBER
+        elif value.type == 'number':
+            state = GenState.IN_PARAMETER_VALUE_FLOAT
         typed_b = typed
         current_ids, typed = generate_field(sdk, current_ids, typed,
                                             state, valid_names,
                                             token_lookup, int_value)
         r_value = typed[len(typed_b):]
-        print(r_value)
         try:
             if value.type == 'string':
                 parameters[key] = r_value.rstrip('"')

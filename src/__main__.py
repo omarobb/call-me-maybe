@@ -9,6 +9,9 @@ import os
 
 if __name__ == "__main__":
     sdk = Small_LLM_Model()
+    OKBLUE = '\033[95m'
+    GREEN = "\033[32m"
+    RESET = "\033[0m"
     prompt = load_prompt_definitions('data/input/function_calling_tests.json')
     try:
         os.mkdir('./data/output')
@@ -24,12 +27,17 @@ if __name__ == "__main__":
     function_name = load_function_name(
                             'data/input/functions_definition.json')
     loockup = build_token_loockup(sdk)
-    for pro in prompt:
+    for i, pro in enumerate(prompt):
         data = generate_one_call(sdk, pro.prompt,
                                  function_definitions,
                                  function_name,
                                  loockup).model_dump()
         final.append(data)
-        print(data)
+        print(f"{OKBLUE}Test {i+1}: {pro}{RESET}")
+        print("------------------------------------"
+              "------------------------------------")
+        print(f"{GREEN}{data}{RESET}")
+        print("------------------------------------"
+              "------------------------------------")
     with open('./data/output/function_calling_results.json', 'w') as f:
         dump(final, f, indent=4)
