@@ -28,16 +28,18 @@ if __name__ == "__main__":
                             'data/input/functions_definition.json')
     loockup = build_token_loockup(sdk)
     for i, pro in enumerate(prompt):
+        print(f"{OKBLUE}Test {i+1}: {pro}{RESET}")
+        print("------------------------------------"
+              "------------------------------------")
         data = generate_one_call(sdk, pro.prompt,
                                  function_definitions,
                                  function_name,
                                  loockup).model_dump()
         final.append(data)
-        print(f"{OKBLUE}Test {i+1}: {pro}{RESET}")
-        print("------------------------------------"
-              "------------------------------------")
         print(f"{GREEN}{data}{RESET}")
         print("------------------------------------"
               "------------------------------------")
     with open('./data/output/function_calling_results.json', 'w') as f:
         dump(final, f, indent=4)
+
+    

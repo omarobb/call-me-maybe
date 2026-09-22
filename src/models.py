@@ -140,19 +140,35 @@ def build_token_loockup(sdk: Small_LLM_Model) -> dict[int, str]:
 def build_priming_text(prompt_text: str,
                        function_defs: list[FunctionEntry]) -> str:
     instruction = (
-        "/no_think",
-        "Select exactly one available function that can fulfill the request.",
-        "Compare the meaning of the request with each function description.",
-        "Extract every required parameter from the request.",
-        "Copy string values exactly and do not invent additional content.",
-        "Return only the function-call JSON object without explanations or",
-        " additional text."
+        "/no_think\n"
+        "You are a strict function-calling router specialized for regex-based string"
+        " transformations.\n"
+        "Choose exactly one function from the list whose purpose best matches the"
+        " user request if not choose Unkown .\n"
+        "Important: the 'regex' field must be a literal regex pattern string only,"
+        " with no surrounding prose, no Python code wrappers, no labels,"
+        " no explanation text, and no extra words. Output raw regex syntax only.\n"
+        "Examples:\n"
+        "- Replace all numbers -> regex: ([0-9]+)\n"
+        "- Replace all vowels -> regex: aeiouAEIOU \n"
+        "For example, if the user says 'replace all vowels ... with asterisks', the"
+        " replacement must be '*'"
+        " text.\n"
+        "If the user says 'substitute the word cat with dog', the regex should be the"
+        " literal word pattern cat, no longer phrase.\n"
+        "Extract only the parameters explicitly required by the selected function and"
+        " copy the source string exactly as written by the user.\n"
+        "Return only a valid JSON object with keys 'name' and 'parameters', with no"
+        " markdown, comments, or extra text.",
+        "no repete the value of regex",
     )
 
     function_json = TypeAdapter(list[FunctionEntry]).dump_json(function_defs)
 
-    return f"{instruction} \n\n Available functions: \n"\
-           f"{function_json}\n\n User request: \n{prompt_text}\n\n"
+    return (
+        f"{instruction} \n\n Available functions: \n{function_json}\n\n" 
+        f"User request:\n  {prompt_text}    \n\n"
+    )
 
 
 def has_repeating_tail(field_typed: str, block_size: int) -> bool:
