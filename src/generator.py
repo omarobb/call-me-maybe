@@ -48,6 +48,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                 and best_token_str.endswith('"'):
             break
         if state == GenState.IN_PARAMETER_VALUE_NUMBER\
+                or GenState.IN_PARAMETER_VALUE_FLOAT\
                 and best_token_str in (',', '}'):
             current_ids.pop()
             typed = typed[0:-1]
@@ -90,8 +91,12 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
         try:
             if value.type == 'string':
                 parameters[key] = r_value.rstrip('"')
-            else:
+            elif value.type == 'integer':
                 parameters[key] = float(r_value)
+            elif value.type == 'number':
+                parameters[key] = int(r_value)
+            elif value.type == 'boolean':
+                parameters[key] = bool(r_value)               
         except ValueError:
             break
 

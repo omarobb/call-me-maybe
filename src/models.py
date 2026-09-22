@@ -65,6 +65,20 @@ def is_valid_integer_continuation(s: str, typed: str) -> bool:
     return (typed+s).isdigit()
 
 
+def is_valid_number_continuation(s: str, typed: str) -> bool:
+    condidate = typed + s
+    if condidate == '' or condidate == '-':
+        return True
+    if condidate.startswith('-'):
+        condidate = condidate[1:]
+        if '-' in condidate:
+            return False
+    if condidate.count('.') > 1:
+        return False
+    without_dot = condidate.replace('.', '', 1)
+    return without_dot.isdigit() or without_dot == ''
+
+
 def build_parameter_schema(fn_name: str,
                            fn_defintion: list[FunctionEntry])\
                            -> dict[str, ParameterInfo]:
