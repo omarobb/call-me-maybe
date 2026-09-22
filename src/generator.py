@@ -36,7 +36,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
             for block_size in [3, 5, 6, 7, 8,
                                9, 10, 11, 15, 17, 18, 19, 20]:
                 if has_repeating_tail(field_typed, block_size):
-                    typed = typed[:-block_size-2] + '"'
+                    typed = typed[:-block_size] + '"'
                     go = False
                     break
         if state == GenState.IN_FUNCTION_NAME and best_token_str == '"':
