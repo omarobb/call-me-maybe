@@ -33,7 +33,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                     best_token_str = '}'
         field_typed += best_token_str
         if state == GenState.IN_PARAMETER_VALUE_STRING:
-            for block_size in [1, 2, 3, 5, 6, 7, 8,
+            for block_size in [3, 5, 6, 7, 8,
                                9, 10, 11, 15, 17, 18, 19, 20]:
                 if has_repeating_tail(field_typed, block_size):
                     typed = typed[:-block_size-2] + '"'
@@ -43,7 +43,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
             typed = typed[0:-1]
             break
         if state == GenState.IN_PARAMETER_VALUE_STRING \
-                and best_token_str == '"':
+                and best_token_str.endswith('"'):
             break
         if state == GenState.IN_PARAMETER_VALUE_NUMBER\
                 and best_token_str in (',', '}'):
