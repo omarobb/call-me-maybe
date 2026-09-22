@@ -12,7 +12,8 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                    typed: str, state: GenState,
                    valid_name: list[str],
                    token_lookup: dict[int, str],
-                   int_value: list[Any]) -> tuple[list[int], str]:
+                   int_value: list[Any]) -> tuple[list[int] | list[float],
+                                                  str]:
     field_typed = ""
     go = True
     while go:
@@ -26,12 +27,13 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
         if field_typed and field_typed.isdigit():
             if any(v for v in int_value
                    if int(field_typed) == int(v)
-                   or float(field_typed) == int(v)):
+                   or float(field_typed) == float(v)):
                 if len(int_value) > 1:
                     best_token_str = ','
                 else:
                     best_token_str = '}'
         field_typed += best_token_str
+        print(field_typed)
         if state == GenState.IN_PARAMETER_VALUE_STRING:
             for block_size in [3, 5, 6, 7, 8,
                                9, 10, 11, 15, 17, 18, 19, 20]:
@@ -89,7 +91,7 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
             if value.type == 'string':
                 parameters[key] = r_value.rstrip('"')
             else:
-                parameters[key] = int(r_value)
+                parameters[key] = float(r_value)
         except ValueError:
             break
 

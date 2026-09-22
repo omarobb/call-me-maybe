@@ -25,7 +25,7 @@ class FunctionEntry(BaseModel):
 class FunctionCallResult(BaseModel):
     prompt: str
     name: str
-    parameters: dict[str, (int | str)]
+    parameters: dict[str, (int | str | float)]
 
 
 def is_complete_name(typed: str, valid: list[str]) -> bool:
