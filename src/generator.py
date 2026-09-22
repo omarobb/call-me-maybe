@@ -19,7 +19,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
     while go:
         start = time.time()
         logits = sdk.get_logits_from_input_ids(current_ids)
-        print(f"step took {time.time()-start:.2f}s, seq len {len(current_ids)}, typed so far: {typed!r}")
+        # print(f"step took {time.time()-start:.2f}s, seq len {len(current_ids)}, typed so far: {typed!r}")
 
         masked = mask_logits(logits, field_typed,
                              state, valid_name, token_lookup)
@@ -35,14 +35,11 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                     best_token_str = '}'
         field_typed += best_token_str
         if state == GenState.IN_PARAMETER_VALUE_STRING:
-            for block_size in [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 15, 17, 18, 19, 20, 21, 22]:
+            for block_size in [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 15, 17, 18, 19, 20]:
                 if has_repeating_tail(field_typed, block_size):
-                    typed = typed[:-block_size-1] + '"'
+                    typed = typed[:-block_size] + '"'
                     go = False
                     break
-        if not go:
-            typed += '"'
-            break
         if state == GenState.IN_FUNCTION_NAME and best_token_str == '"':
             typed = typed[0:-1]
             break
@@ -61,7 +58,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
 def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
                       function_defs: list[FunctionEntry],
                       valid_names: list[str],
-                      token_lookup: dict[int, str]) -> FunctionCallResult:
+                      token_lookup: dict[int, str]) -> str:
     int_value = re.findall(r'\d+', prompt_txt)
 
     priming_txt = build_priming_text(prompt_txt, function_defs)
@@ -85,7 +82,8 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
             if value.type == 'string' else GenState.IN_PARAMETER_VALUE_NUMBER
         typed_b = typed
         current_ids, typed = generate_field(sdk, current_ids, typed,
-                                            state, valid_names, token_lookup, int_value)
+                                            state, valid_names,
+                                            token_lookup, int_value)
         r_value = typed[len(typed_b):]
 
         try:
@@ -100,6 +98,6 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
             typed += ', '
             current_ids = sdk.encode(priming_txt + typed).tolist()[0]
     typed += '}}'
-
-    return FunctionCallResult(prompt=prompt_txt,
-                              name=function_name, parameters=parameters)
+    typed = typed[1:]
+    return '{' \
+           f'"prompt": "{prompt_txt}", {typed}'
