@@ -24,7 +24,6 @@ if __name__ == "__main__":
     function_name = load_function_name(
                             'data/input/functions_definition.json')
     loockup = build_token_loockup(sdk)
-    data = FunctionCallResult
     for pro in prompt:
         data = generate_one_call(sdk, pro.prompt,
                                  function_definitions,

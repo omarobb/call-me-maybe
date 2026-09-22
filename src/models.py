@@ -126,11 +126,14 @@ def build_token_loockup(sdk: Small_LLM_Model) -> dict[int, str]:
 def build_priming_text(prompt_text: str,
                        function_defs: list[FunctionEntry]) -> str:
     instruction = (
-        "You are a function-calling assistant. Given a user request and "
-        "a list of available functions with their parameters, choose "
-        "exactly one function and extract its arguments from the request. "
-        "Respond with a JSON object of the form "
-        '{"name": <function name>, "parameters": {...}}.'
+        "/no_think",
+        "Select exactly one available function that can fulfill the request.",
+        "Compare the meaning of the request with each function description.",
+        "Different wording or synonyms still count as a match.",
+        "Extract every required parameter from the request.",
+        "Copy string values exactly and do not invent additional content.",
+        "Return only the function-call JSON object without explanations or",
+        " additional text."
     )
 
     function_json = TypeAdapter(list[FunctionEntry]).dump_json(function_defs)
