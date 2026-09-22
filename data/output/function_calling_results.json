@@ -5,7 +5,7 @@
         "parameters": {
             "principal": 1234567.0,
             "rate": 0.0,
-            "years": 23.0
+            "years": 23
         }
     }
 ]

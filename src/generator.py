@@ -26,8 +26,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
         typed = typed+best_token_str
         if field_typed and field_typed.isdigit():
             if any(v for v in int_value
-                   if int(field_typed) == int(v)
-                   or float(field_typed) == float(v)):
+                   if field_typed == v):
                 if len(int_value) > 1:
                     best_token_str = ','
                 else:
@@ -48,11 +47,14 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
                 and best_token_str.endswith('"'):
             break
         if state == GenState.IN_PARAMETER_VALUE_NUMBER\
-                or GenState.IN_PARAMETER_VALUE_FLOAT\
                 and best_token_str in (',', '}'):
             current_ids.pop()
             typed = typed[0:-1]
             field_typed = field_typed[0:-1]
+            break
+        if state == GenState.IN_PARAMETER_VALUE_FLOAT and best_token_str\
+                in (',', '}'):
+            
             break
     return (current_ids, typed)
 
@@ -61,7 +63,13 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
                       function_defs: list[FunctionEntry],
                       valid_names: list[str],
                       token_lookup: dict[int, str]) -> FunctionCallResult:
-    int_value = re.findall(r'\d+', prompt_txt)
+    int_value = re.findall(r'\d+.\d+', prompt_txt)
+    for i in re.findall(r'\d+', prompt_txt):
+        for j in int_value:
+            if not int(i) == int(float(j)):
+                if i not in int_value:
+                    int_value.append(i)
+    print(int_value)
 
     priming_txt = build_priming_text(prompt_txt, function_defs)
     typed = '{"name": "'
@@ -87,16 +95,16 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
                                             state, valid_names,
                                             token_lookup, int_value)
         r_value = typed[len(typed_b):]
-
+        print(r_value)
         try:
             if value.type == 'string':
                 parameters[key] = r_value.rstrip('"')
             elif value.type == 'integer':
-                parameters[key] = float(r_value)
-            elif value.type == 'number':
                 parameters[key] = int(r_value)
+            elif value.type == 'number':
+                parameters[key] = float(r_value)
             elif value.type == 'boolean':
-                parameters[key] = bool(r_value)               
+                parameters[key] = bool(r_value)
         except ValueError:
             break
 
