@@ -25,6 +25,8 @@ if __name__ == "__main__":
                             'data/input/functions_definition.json')
     function_name = load_function_name(
                             'data/input/functions_definition.json')
+    print(function_name)
+
     loockup = build_token_loockup(sdk)
     for i, pro in enumerate(prompt):
         print(f"{OKBLUE}Test {i+1}: {pro}{RESET}")

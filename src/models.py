@@ -162,24 +162,21 @@ def build_token_loockup(sdk: LLM) -> dict[int, str]:
 def build_priming_text(prompt_text: str,
                        function_defs: list[FunctionEntry]) -> str:
     instruction = (
-        "/no_think\n"
-        "You are a strict function-calling "
-        "router specialized for regex-based string"
-        " transformations.\n"
-        "If none of the listed functions matches the"
-        "request well enough, choose the fallback"
-        " function named 'Unknown' and return its"
-        " required empty parameter object instead of inventing a new function.\n"
-        "Important: the 'regex' field must"
-        "be a literal regex pattern string only,"
-        " with no surrounding prose, no Python code wrappers, no labels,"
-        " no explanation text, and no extra words."
-        "Output raw regex syntax only.\n"
-        "Examples:\n"
-        "- Replace all numbers -> regex: ([0-9]+)\n"
-        "- Replace all vowels -> regex: aeiouAEIOU\n"
-        "Do not repeat the regex value."
-    )
+        "You are a function-calling assistant. Given a user request and a list of "
+        "available functions, select exactly one function and extract its arguments.\n\n"
+        "Rules:\n"
+        "- Only use functions and parameters from the provided list.\n"
+        "- Every string parameter value must be an exact substring copied from the "
+        "user request. Never modify it — do not add prefixes/suffixes, do not "
+        "pluralize, do not append words like '_db', '_table', '_id' even if they "
+        "seem like a natural convention. If the request says 'system', the value "
+        "is 'system', not 'system_db'.\n"
+        "- Fill every parameter defined for the selected function.\n\n"
+        "Example:\n"
+        "Request: \"Run the query 'SELECT 1' on the system database\"\n"
+        "Call: {\"name\": \"fn_execute_sql_query\", \"parameters\": "
+        "{\"query\": \"SELECT 1\", \"database\": \"system\"}}\n\n"
+       )
 
     function_json = TypeAdapter(list[FunctionEntry]).dump_json(function_defs)
 
