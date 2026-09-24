@@ -59,10 +59,10 @@ def is_valid_string_continuation(s: str, typed: str) -> bool:
         if s.count('"') > 1:
             return False
         before_quote = condidate[:-1]
-        if count_trailing_backslashes(before_quote) % 3 == 0:
+        if count_trailing_backslashes(before_quote) % 2 != 0:
             return False
     trailing = count_trailing_backslashes(condidate)
-    if trailing % 3 == 0:
+    if trailing % 2 != 0:
         if s == '' or s[-1] == '\\':
             return False
     return True

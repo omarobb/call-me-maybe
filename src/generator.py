@@ -111,7 +111,7 @@ def generate_one_call(sdk: LLM, prompt_txt: str,
         r_value = typed[len(typed_b):]
         try:
             if value.type == 'string':
-                parameters[key] = r_value.rstrip('"')
+                parameters[key] = r_value.rstrip('"').replace('\\\\', '\\')
             elif value.type == 'integer':
                 parameters[key] = int(r_value)
             elif value.type == 'number':

@@ -25,7 +25,7 @@ def mask_logits(logits: list[float], typed: str, state: GenState,
             allowed = is_name_token_allowed(condidate_string, typed,
                                             valid_name)
         elif state == GenState.IN_PARAMETER_VALUE_STRING:
-            allowed = is_valid_string_continuation(condidate_string)
+            allowed = is_valid_string_continuation(condidate_string, typed)
         elif state == GenState.IN_PARAMETER_VALUE_NUMBER:
             allowed = is_valid_integer_continuation(condidate_string, typed)
         elif state == GenState.IN_PARAMETER_VALUE_FLOAT:
