@@ -1,5 +1,12 @@
 [
     {
+        "prompt": "adgfjhsaertdyjfd",
+        "name": "Unknown",
+        "parameters": {
+            "empty": "string"
+        }
+    },
+    {
         "prompt": "Format template: Say \"hello\" to {name}",
         "name": "fn_format_template",
         "parameters": {

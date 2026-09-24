@@ -30,6 +30,9 @@ if __name__ == "__main__":
         print(f"{OKBLUE}Test {i+1}: {pro}{RESET}")
         print("------------------------------------"
               "------------------------------------")
+        if str(pro) == "prompt=''":
+            print("Empty prompt")
+            continue
         data = generate_one_call(sdk, pro.prompt,
                                  function_definitions,
                                  function_name,

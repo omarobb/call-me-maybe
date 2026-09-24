@@ -56,8 +56,9 @@ def generate_field(sdk: LLM, current_ids: list[int],
             typed = typed[0:-1]
             break
         if state == GenState.IN_PARAMETER_VALUE_STRING \
-                and best_token_str.endswith('"') and field_typed[-1] != '\\':
-            print('----------------------------------------')
+                and best_token_str.endswith('"') and count_trailing_backslashes(typed) % 2 == 0:
+            print('--------------------------------------')
+            field_typed += '"'
             break
         if state == GenState.IN_PARAMETER_VALUE_NUMBER\
                 and best_token_str in (',', '}'):
@@ -68,6 +69,7 @@ def generate_field(sdk: LLM, current_ids: list[int],
         if state == GenState.IN_PARAMETER_VALUE_FLOAT and best_token_str\
                 in (',', '}'):
             break
+        print(typed)
     return (current_ids, typed)
 
 

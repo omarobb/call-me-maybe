@@ -1,0 +1,14 @@
+[
+    {
+    "name": "unkown",
+    "description": "for propmt that unreadable for any function.",
+    "parameters": {
+      "empty": {
+        "type": "string"
+      }
+    },
+    "returns": {
+      "type": "string"
+    }
+    }
+]
