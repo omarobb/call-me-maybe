@@ -9,13 +9,12 @@ dependencies = [
     "argparse>=1.4.0",
     "flake8>=7.3.0",
     "mypy>=2.3.1",
-    "numpy>=2.5.2",
     "pydantic>=2.13.5",
     "accelerate",
 ]
 
 [tool.uv.sources]
-llm_sdk = {path = "./llm_sdk/"}
+llm_sdk = {path = "./llm_sdk"}
 
 [project.scripts]
 call = "call-me-maybe.src:main"
@@ -23,6 +22,8 @@ call = "call-me-maybe.src:main"
 [tool.uv.build-backend]
 module-name="src"
 module-root=""
+
+
 
 [build-system]
 requires = ["uv_build>=0.12.9,<0.13.0"]

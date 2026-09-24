@@ -138,7 +138,6 @@ dependencies = [
     { name = "flake8" },
     { name = "llm-sdk" },
     { name = "mypy" },
-    { name = "numpy" },
     { name = "pydantic" },
 ]
 
@@ -149,7 +148,6 @@ requires-dist = [
     { name = "flake8", specifier = ">=7.3.0" },
     { name = "llm-sdk", directory = "llm_sdk" },
     { name = "mypy", specifier = ">=2.3.1" },
-    { name = "numpy", specifier = ">=2.5.2" },
     { name = "pydantic", specifier = ">=2.13.5" },
 ]
 

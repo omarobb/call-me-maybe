@@ -1,4 +1,4 @@
-from llm_sdk import Small_LLM_Model
+from llm_sdk import Small_LLM_Model as LLM
 from .constrained_decoder import GenState, mask_logits
 from typing import Any
 from .models import (build_priming_text, FunctionEntry,
@@ -8,7 +8,7 @@ from .models import (build_priming_text, FunctionEntry,
 import re
 
 
-def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
+def generate_field(sdk: LLM, current_ids: list[int],
                    typed: str, state: GenState,
                    valid_name: list[str],
                    token_lookup: dict[int, str],
@@ -69,7 +69,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
     return (current_ids, typed)
 
 
-def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
+def generate_one_call(sdk: LLM, prompt_txt: str,
                       function_defs: list[FunctionEntry],
                       valid_names: list[str],
                       token_lookup: dict[int, str]) -> FunctionCallResult:

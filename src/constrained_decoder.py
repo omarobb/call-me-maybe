@@ -1,5 +1,4 @@
 from enum import Enum
-# from llm_sdk import Small_LLM_Model
 from .models import (is_name_token_allowed,
                      is_valid_integer_continuation,
                      is_valid_string_continuation,

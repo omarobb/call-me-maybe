@@ -1,4 +1,4 @@
-from llm_sdk import Small_LLM_Model
+from llm_sdk import Small_LLM_Model as LLM
 from pydantic import BaseModel, ValidationError, TypeAdapter
 from typing import Any
 import sys
@@ -42,14 +42,29 @@ def is_name_token_allowed(candidate_token: str,
         return is_valid(candidate_token, typed, valid)
 
 
-def is_valid_string_continuation(s: str) -> bool:
+def count_trailing_backslashes(text: str) -> int:
+    count = 0
+    i = len(text) -1
+    while (i >= 0 and text[i] == '\\'):
+        count += 1
+        i -= 1
+    return count
+
+
+def is_valid_string_continuation(s: str, typed: str) -> bool:
+    condidate = typed + s 
     if '"' in s:
         if not s[-1] == '"':
             return False
         if s.count('"') > 1:
             return False
-    if s.endswith('\\'):
-        return False
+        before_quote = condidate[:-1]
+        if count_trailing_backslashes(before_quote) % 3 == 0:
+            return False
+    trailing = count_trailing_backslashes(condidate)
+    if trailing % 3 == 0:
+        if s == '' or s[-1] == '\\':
+            return False
     return True
 
 
@@ -124,7 +139,7 @@ def load_prompt_definitions(path: str) -> Any:
         sys.exit(1)
 
 
-def build_token_loockup(sdk: Small_LLM_Model) -> dict[int, str]:
+def build_token_loockup(sdk: LLM) -> dict[int, str]:
     ids = sdk.encode('a')
     ids = ids.tolist()[0]
     log = sdk.get_logits_from_input_ids(ids)

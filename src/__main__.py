@@ -1,13 +1,13 @@
 from .models import (load_function_definitions, load_prompt_definitions,
                      build_token_loockup, load_function_name)
-from llm_sdk import Small_LLM_Model
+from llm_sdk import Small_LLM_Model as LLM
 from .generator import generate_one_call
 from json import dump
 import os
 
 
 if __name__ == "__main__":
-    sdk = Small_LLM_Model()
+    sdk = LLM()
     OKBLUE = '\033[95m'
     GREEN = "\033[32m"
     RESET = "\033[0m"
