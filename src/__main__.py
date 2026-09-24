@@ -1,6 +1,5 @@
 from .models import (load_function_definitions, load_prompt_definitions,
-                     build_token_loockup, load_function_name,
-                     FunctionCallResult)
+                     build_token_loockup, load_function_name)
 from llm_sdk import Small_LLM_Model
 from .generator import generate_one_call
 from json import dump
@@ -41,5 +40,3 @@ if __name__ == "__main__":
               "------------------------------------")
     with open('./data/output/function_calling_results.json', 'w') as f:
         dump(final, f, indent=4)
-
-    

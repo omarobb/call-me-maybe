@@ -1,10 +1,8 @@
 from llm_sdk import Small_LLM_Model
 from pydantic import BaseModel, ValidationError, TypeAdapter
-# from cli import loader
+from typing import Any
 import sys
 import json
-# from typing import Any
-# from typing import TextIO
 
 
 class ParameterInfo(BaseModel):
@@ -88,7 +86,7 @@ def build_parameter_schema(fn_name: str,
     raise ValueError("There is no function like that")
 
 
-def load_function_definitions(path: str) -> list[FunctionEntry]:
+def load_function_definitions(path: str) -> Any:
     try:
         with open(path, 'r', encoding='utf-8') as p:
             ls = json.load(p)
@@ -114,7 +112,7 @@ def load_function_name(path: str) -> list[str]:
         sys.exit(1)
 
 
-def load_prompt_definitions(path: str) -> list[Prompt]:
+def load_prompt_definitions(path: str) -> Any:
     try:
         with open(path, 'r', encoding='utf-8') as p:
             ls = json.load(p)
@@ -141,24 +139,32 @@ def build_priming_text(prompt_text: str,
                        function_defs: list[FunctionEntry]) -> str:
     instruction = (
         "/no_think\n"
-        "You are a strict function-calling router specialized for regex-based string"
+        "You are a strict function-calling "
+        "router specialized for regex-based string"
         " transformations.\n"
-        "Choose exactly one function from the list whose purpose best matches the"
+        "Choose exactly one function from the"
+        "list whose purpose best matches the"
         " user request if not choose Unkown .\n"
-        "Important: the 'regex' field must be a literal regex pattern string only,"
+        "Important: the 'regex' field must"
+        "be a literal regex pattern string only,"
         " with no surrounding prose, no Python code wrappers, no labels,"
-        " no explanation text, and no extra words. Output raw regex syntax only.\n"
+        " no explanation text, and no extra words."
+        "Output raw regex syntax only.\n"
         "Examples:\n"
         "- Replace all numbers -> regex: ([0-9]+)\n"
         "- Replace all vowels -> regex: aeiouAEIOU \n"
-        "For example, if the user says 'replace all vowels ... with asterisks', the"
+        "For example, if the user says "
+        "'replace all vowels ... with asterisks', the"
         " replacement must be '*'"
         " text.\n"
-        "If the user says 'substitute the word cat with dog', the regex should be the"
+        "If the user says 'substitute the word "
+        "cat with dog', the regex should be the"
         " literal word pattern cat, no longer phrase.\n"
-        "Extract only the parameters explicitly required by the selected function and"
+        "Extract only the parameters explicitly "
+        "required by the selected function and"
         " copy the source string exactly as written by the user.\n"
-        "Return only a valid JSON object with keys 'name' and 'parameters', with no"
+        "Return only a valid JSON object "
+        "with keys 'name' and 'parameters', with no"
         " markdown, comments, or extra text.",
         "no repete the value of regex",
     )
@@ -166,7 +172,7 @@ def build_priming_text(prompt_text: str,
     function_json = TypeAdapter(list[FunctionEntry]).dump_json(function_defs)
 
     return (
-        f"{instruction} \n\n Available functions: \n{function_json}\n\n" 
+        f"{instruction} \n\n Available functions: \n{function_json}\n\n"
         f"User request:\n  {prompt_text}    \n\n"
     )
 

@@ -36,7 +36,3 @@ def mask_logits(logits: list[float], typed: str, state: GenState,
             masked[token_ids] = -inf
 
     return masked
-
-    
-
-

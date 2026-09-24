@@ -24,7 +24,7 @@ def generate_field(sdk: Small_LLM_Model, current_ids: list[int],
         best_token_str = token_lookup[h_token_id]
         current_ids.append(h_token_id)
         typed = typed+best_token_str
-        
+
         if field_typed and field_typed.isdigit():
             if any(v for v in int_value
                    if field_typed == v):
@@ -91,13 +91,13 @@ def generate_one_call(sdk: Small_LLM_Model, prompt_txt: str,
     schema = build_parameter_schema(function_name, function_defs)
     typed = typed + '", "parameters": {'
     current_ids = sdk.encode(priming_txt + typed).tolist()[0]
-    parameters = {}
+    parameters: dict[Any, Any] = {}
     for i, (key, value) in enumerate(schema.items()):
         typed = typed + '"' + key + '": '
         if value.type == 'string':
             typed += '"'
         current_ids = sdk.encode(priming_txt+typed).tolist()[0]
-        state = 0
+        state = GenState.IN_PARAMETER_VALUE_STRING
         if value.type == 'string':
             state = GenState.IN_PARAMETER_VALUE_STRING
         elif value.type == 'integer':
