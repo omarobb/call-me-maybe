@@ -4,7 +4,8 @@ from typing import Any
 from .models import (build_priming_text, FunctionEntry,
                      build_parameter_schema,
                      FunctionCallResult,
-                     has_repeating_tail)
+                     has_repeating_tail,
+                     count_trailing_backslashes)
 import re
 
 
@@ -55,7 +56,8 @@ def generate_field(sdk: LLM, current_ids: list[int],
             typed = typed[0:-1]
             break
         if state == GenState.IN_PARAMETER_VALUE_STRING \
-                and best_token_str.endswith('"'):
+                and best_token_str.endswith('"') and field_typed[-1] != '\\':
+            print('----------------------------------------')
             break
         if state == GenState.IN_PARAMETER_VALUE_NUMBER\
                 and best_token_str in (',', '}'):
