@@ -1,35 +1,5 @@
 [
     {
-        "prompt": "What is the product of 3 and 5?",
-        "name": "fn_multiply_numbers",
-        "parameters": {
-            "a": 3.0,
-            "b": 5.0
-        }
-    },
-    {
-        "prompt": "What is the product of 12 and 4?",
-        "name": "fn_multiply_numbers",
-        "parameters": {
-            "a": 12.0,
-            "b": 4.0
-        }
-    },
-    {
-        "prompt": "Is 4 an even number?",
-        "name": "fn_is_even",
-        "parameters": {
-            "n": 4
-        }
-    },
-    {
-        "prompt": "Is 7 an even number?",
-        "name": "fn_is_even",
-        "parameters": {
-            "n": 7
-        }
-    },
-    {
         "prompt": "Calculate compound interest on 1234567.89 at 0.0375 rate for 23 years",
         "name": "fn_calculate_compound_interest",
         "parameters": {
@@ -51,7 +21,7 @@
         "name": "fn_execute_sql_query",
         "parameters": {
             "query": "INSERT INTO logs VALUES (1, 2, 3)",
-            "database": "system"
+            "database": "system_db"
         }
     },
     {
@@ -66,7 +36,7 @@
         "prompt": "Read C:\\Users\\john\\config.ini with latin-1 encoding",
         "name": "fn_read_file",
         "parameters": {
-            "path": "C:\\Users\\john\\config.ini\\database.db\\config.ini.encodings.latin-1",
+            "path": "C:\\Users\\john\\config.ini\\encoding\\latin-1",
             "encoding": "latin-1"
         }
     },
