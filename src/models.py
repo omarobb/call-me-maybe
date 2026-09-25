@@ -162,20 +162,17 @@ def build_token_loockup(sdk: LLM) -> dict[int, str]:
 def build_priming_text(prompt_text: str,
                        function_defs: list[FunctionEntry]) -> str:
     instruction = (
-        "You are a function-calling assistant. Given a user request and a list of "
-        "available functions, select exactly one function and extract its arguments.\n\n"
-        "Rules:\n"
-        "- Only use functions and parameters from the provided list.\n"
-        "- Every string parameter value must be an exact substring copied from the "
-        "user request. Never modify it — do not add prefixes/suffixes, do not "
-        "pluralize, do not append words like '_db', '_table', '_id' even if they "
+        "/no_think",
+        "Compare the meaning of the request with each function description.",
+        "Copy string values exactly and do not invent additional content.",
+        "Extract every required parameter from the request.",
+        "Do not append words like '_db', '_table', '_id'even if they "
         "seem like a natural convention. If the request says 'system', the value "
         "is 'system', not 'system_db'.\n"
-        "- Fill every parameter defined for the selected function.\n\n"
-        "Example:\n"
-        "Request: \"Run the query 'SELECT 1' on the system database\"\n"
-        "Call: {\"name\": \"fn_execute_sql_query\", \"parameters\": "
-        "{\"query\": \"SELECT 1\", \"database\": \"system\"}}\n\n"
+        "Every string parameter value must be an exact substring copied from the "
+        "user request."
+        "Return only the function-call JSON object without explanations or",
+        " additional text."
        )
 
     function_json = TypeAdapter(list[FunctionEntry]).dump_json(function_defs)

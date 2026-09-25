@@ -34,7 +34,7 @@ debug:
 	uv run python -m pdb -m src
 
 test:
-	uv run python -m ./moulinette/moulinette grade_student_answers --set private --student_answer_path ../data/output/function_calling_results.json
+	uv run python -m moulinette grade_student_answers --set private --student_answer_path ../data/output/function_calling_results.json
 
 lint:
 	uv run flake8 src/
