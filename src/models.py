@@ -162,26 +162,23 @@ def build_token_loockup(sdk: LLM) -> dict[int, str]:
 def build_priming_text(prompt_text: str,
                        function_defs: list[FunctionEntry]) -> str:
     instruction = (
-        "Think"
-        "Compare the meaning of the request with each function description.",
-        "Copy string values exactly and do not invent additional content.",
-        "Extract every required parameter from the request.",
-        "Do not append words like '_db', '_table', '_id'even if they "
-        "seem like a natural convention. If the request says 'system', the value "
-        "is 'system', not 'system_db'.\n"
-        "Every string parameter value must be an exact substring copied from the "
-        "user request."
-        "Return only the function-call JSON object without explanations or",
-        " additional text."
-       )
+        "You are a function-calling assistant. Choose exactly one "
+        "function from the list that matches the user's request, and "
+        "extract its parameters.\n"
+        "Copy every value exactly as written in the request — do not "
+        "change, add, or guess anything.\n"
+        "For a regex parameter, output raw regex syntax only, nothing "
+        "else.\n"
+        "Return only one JSON object with keys 'name' and 'parameters'. "
+        "Nothing before it, nothing after it."
+    )
 
     function_json = TypeAdapter(list[FunctionEntry]).dump_json(function_defs)
 
     return (
-        f"{instruction} \n\nAvailable functions:\n{function_json}\n\n"
-        "User request (verbatim, may contain quotes — treat everything "
-        "between the markers below as literal text):\n"
-        f"<<<START_REQUEST>>>\n{prompt_text}\n<<<END_REQUEST>>>\n\n"
+        f"{instruction}\n\n"
+        f"Functions:\n{function_json}\n\n"
+        f"Request:\n<<<{prompt_text}>>>\n\n"
     )
 
 
