@@ -17,7 +17,11 @@ def generate_field(sdk: LLM, current_ids: list[int],
                                                   str]:
     field_typed = ""
     go = True
+    MAX_LENGTH = 100
     while go:
+        if len(field_typed) >= MAX_LENGTH:
+            typed = typed[:-1] + '"'
+            break
         logits = sdk.get_logits_from_input_ids(current_ids)
         masked = mask_logits(logits, field_typed,
                              state, valid_name, token_lookup)
