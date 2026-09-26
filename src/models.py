@@ -162,7 +162,7 @@ def build_token_loockup(sdk: LLM) -> dict[int, str]:
 def build_priming_text(prompt_text: str,
                        function_defs: list[FunctionEntry]) -> str:
     instruction = (
-        "/no_think",
+        "Think"
         "Compare the meaning of the request with each function description.",
         "Copy string values exactly and do not invent additional content.",
         "Extract every required parameter from the request.",
@@ -179,7 +179,9 @@ def build_priming_text(prompt_text: str,
 
     return (
         f"{instruction} \n\nAvailable functions:\n{function_json}\n\n"
-        f"User request:\n{prompt_text}\n\n"
+        "User request (verbatim, may contain quotes — treat everything "
+        "between the markers below as literal text):\n"
+        f"<<<START_REQUEST>>>\n{prompt_text}\n<<<END_REQUEST>>>\n\n"
     )
 
 
