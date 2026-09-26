@@ -20,10 +20,11 @@ def generate_field(sdk: LLM, current_ids: list[int],
     MAX_LENGTH = 100
     while go:
         if len(field_typed) >= MAX_LENGTH:
-            if state != GenState.IN_PARAMETER_VALUE_NUMBER or state != GenState.IN_PARAMETER_VALUE_FLOAT:
+            if state != GenState.IN_PARAMETER_VALUE_NUMBER\
+               or state != GenState.IN_PARAMETER_VALUE_FLOAT:
                 typed = typed[:-1] + '"'
             else:
-                typed = typed[:-1]                
+                typed = typed[:-1]
             break
         logits = sdk.get_logits_from_input_ids(current_ids)
         masked = mask_logits(logits, field_typed,
@@ -56,14 +57,15 @@ def generate_field(sdk: LLM, current_ids: list[int],
             for block_size in [3, 5, 6, 7, 8,
                                9, 10, 11, 15, 17, 18, 19, 20]:
                 if has_repeating_tail(field_typed, block_size):
-                    typed = typed[:-block_size] + '"'
+                    typed = typed[:-block_size-2] + '"'
                     go = False
                     break
         if state == GenState.IN_FUNCTION_NAME and best_token_str == '"':
             typed = typed[0:-1]
             break
         if state == GenState.IN_PARAMETER_VALUE_STRING \
-                and best_token_str.endswith('"') and count_trailing_backslashes(typed) % 2 == 0:
+                and best_token_str.endswith('"')\
+                and count_trailing_backslashes(typed) % 2 == 0:
             break
         if state == GenState.IN_PARAMETER_VALUE_NUMBER\
                 and best_token_str in (',', '}'):
@@ -77,7 +79,7 @@ def generate_field(sdk: LLM, current_ids: list[int],
     return (current_ids, typed)
 
 
-def generate_one_call(sdk: LLM, prompt_txt: str,
+def generate_one_call(sdk: LLM, prompt_txt: Any,
                       function_defs: list[FunctionEntry],
                       valid_names: list[str],
                       token_lookup: dict[int, str]) -> FunctionCallResult:
@@ -119,7 +121,8 @@ def generate_one_call(sdk: LLM, prompt_txt: str,
         r_value = typed[len(typed_b):]
         try:
             if value.type == 'string':
-                parameters[key] = r_value.rstrip('"').replace('\\\\', '\\')
+                parameters[key] = r_value.strip()\
+                                  .rstrip('"').replace('\\\\', '\\')
             elif value.type == 'integer':
                 parameters[key] = int(r_value)
             elif value.type == 'number':
@@ -131,7 +134,8 @@ def generate_one_call(sdk: LLM, prompt_txt: str,
 
         if i < len(schema)-1:
             typed += ', '
-            current_ids = sdk.encode(priming_txt + typed).tolist()[0]
+            current_ids = sdk.encode(priming_txt + typed)\
+                             .tolist()[0]
     typed += '}}'
 
     return FunctionCallResult(prompt=prompt_txt,

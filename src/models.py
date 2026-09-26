@@ -44,7 +44,7 @@ def is_name_token_allowed(candidate_token: str,
 
 def count_trailing_backslashes(text: str) -> int:
     count = 0
-    i = len(text) -1
+    i = len(text) - 1
     while (i >= 0 and text[i] == '\\'):
         count += 1
         i -= 1
@@ -52,18 +52,14 @@ def count_trailing_backslashes(text: str) -> int:
 
 
 def is_valid_string_continuation(s: str, typed: str) -> bool:
-    condidate = typed + s 
+    condidate = typed + s
     if '"' in s:
-        if not s[-1] == '"' and count_trailing_backslashes(condidate) % 2 == 0:
+        if not s[-1] == '"':
             return False
-        if s.count('"') > 1 and count_trailing_backslashes(condidate) % 2 == 0:
+        if s.count('"') > 1:
             return False
         before_quote = condidate[:-1]
         if count_trailing_backslashes(before_quote) % 2 != 0:
-            return False
-    trailing = count_trailing_backslashes(condidate)
-    if trailing % 2 != 0:
-        if s == '' or s[-1] == '\\':
             return False
     return True
 
@@ -136,7 +132,7 @@ def load_function_name(path: str) -> list[str]:
         sys.exit(1)
 
 
-def load_prompt_definitions(path: str) -> Any:
+def load_prompt_definitions(path: str) -> list[Prompt]:
     try:
         with open(path, 'r', encoding='utf-8') as p:
             ls = json.load(p)
@@ -165,10 +161,17 @@ def build_priming_text(prompt_text: str,
         "You are a function-calling assistant. Choose exactly one "
         "function from the list that matches the user's request, and "
         "extract its parameters.\n"
-        "Copy every value exactly as written in the request — do not "
-        "change, add, or guess anything.\n"
-        "For a regex parameter, output raw regex syntax only, nothing "
-        "else.\n"
+        "Copy every value exactly as written in the request, character "
+        "for character. Do not change, add, remove, or guess anything.\n"
+        "Each parameter value must contain ONLY that parameter's own "
+        "value — never another parameter's name or value.\n"
+        "\n"
+        "For a regex parameter, output ONLY the raw pattern — no prose, "
+        "no labels, nothing else. Match these examples exactly:\n"
+        "- 'replace all numbers' -> regex: ([0-9]+)\n"
+        "- 'replace all vowels' -> regex: [aeiouAEIOU]\n"
+        "- 'substitute the word cat with dog' -> regex: [cat] \n"
+        "\n"
         "Return only one JSON object with keys 'name' and 'parameters'. "
         "Nothing before it, nothing after it."
     )
@@ -176,8 +179,8 @@ def build_priming_text(prompt_text: str,
     function_json = TypeAdapter(list[FunctionEntry]).dump_json(function_defs)
 
     return (
-        f"{instruction}\n\n"
-        f"Functions:\n{function_json}\n\n"
+        f"{instruction!r}\n\n"
+        f"Functions:\n{function_json!r}\n\n"
         f"Request:\n<<<{prompt_text}>>>\n\n"
     )
 

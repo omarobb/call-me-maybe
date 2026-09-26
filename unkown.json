@@ -1,7 +1,7 @@
 [
     {
     "name": "unkown",
-    "description": "for propmt that unreadable for any function.",
+    "description": "Use this function when the user's request does not clearly match any other available function, or is too ambiguous, unclear, or unrelated to call any specific function correctly.",
     "parameters": {
       "empty": {
         "type": "string"

@@ -1,11 +1,12 @@
 import argparse
 from .models import (load_function_definitions,
-                    load_prompt_definitions, FunctionEntry,
-                    load_function_name)
+                     load_prompt_definitions, FunctionEntry,
+                     load_function_name,
+                     Prompt)
 
 
 def loader() -> tuple[list[FunctionEntry],
-                      list[str], str]:
+                      list[Prompt], str, list[str]]:
     parser = argparse.ArgumentParser()
     parser.add_argument("--functions_definition",
                         default="data/input/functions_definition.json")
@@ -17,8 +18,4 @@ def loader() -> tuple[list[FunctionEntry],
     fun_def = load_function_definitions(args.functions_definition)
     fun_prompt = load_prompt_definitions(args.input)
     function_name = load_function_name(args.functions_definition)
-#    print(fun_d)
-    # print(args.inpu   t)
-    # print(args.output)
-    # print(args.functions_definition)
     return (fun_def, fun_prompt, args.output, function_name)
